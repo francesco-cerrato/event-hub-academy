@@ -1,0 +1,31 @@
+# Specifica la versione della sintassi di Docker Compose utilizzata.
+version: '3.8'
+
+# Il blocco 'services' apre l'elenco dei container che vogliamo accendere.
+services:
+  # Database PostgreSQL per la memorizzazione dei dati di EventHub
+  postgres-db:
+  # Indica a Docker quale pacchetto ufficiale scaricare da internet
+    image: postgres:15-alpine
+    container_name: eventhub-postgres
+    ports:
+      - "5432:5432" # Espone la porta del DB sul PC locale
+    environment:
+      POSTGRES_DB: eventhub # Nome del database iniziale
+      POSTGRES_USER: eventhub_admin # Username di amministrazione del DB
+      POSTGRES_PASSWORD: password123 # Password di accesso
+    volumes:
+      - postgres_data:/var/lib/postgresql/data # Persistenza dei dati sul disco locale
+
+  # Interfaccia web grafica per l'amministrazione visiva del database
+  adminer:
+  # Scarica l'ultima versione disponibile ('latest') del software Adminer da Docker Hub.
+    image: adminer:latest
+    container_name: eventhub-adminer
+    ports:
+      - "8080:8080" # Raggiungibile via browser su http://localhost:8080
+    depends_on:
+      - postgres-db # Attende l'avvio del database prima di partire
+
+volumes:
+  postgres_data: # Dichiarazione del volume per non perdere i dati allo spegnimento
