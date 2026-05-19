@@ -65,6 +65,12 @@ public class SecurityConfig
                 .requestMatchers("/auth/signup").permitAll()
                 // Permette l'accesso alla gestione degli errori di Spring per non nascondere i 404
                 .requestMatchers("/error").permitAll()
+
+                // PUNTO 6 STEP 3: Limita tutti i path che iniziano con /admin/ solo agli utenti ADMIN
+                // Nota: Cerca il ruolo 'ROLE_ADMIN' nel DB, ma nel metodo si scrive solo 'ADMIN'
+                .requestMatchers("/admin/**").hasRole("ADMIN")
+
+
                 // Qualsiasi altra richiesta dell'applicazione richiederà il login obbligatorio
                 .anyRequest().authenticated());
 

@@ -4,6 +4,7 @@ import com.academy.eventhub.dto.UserResponseDto;
 import com.academy.eventhub.dto.UserUpdateDto;
 import com.academy.eventhub.entity.Role;
 import com.academy.eventhub.entity.User;
+import com.academy.eventhub.exception.ResourceNotFoundException;
 import com.academy.eventhub.repository.RoleRepository;
 import com.academy.eventhub.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,7 +45,7 @@ public class UserServiceImpl implements UserService
     {
         // Cerca l'utente sul DB (in caso di assenza lancia un eccezione)
         User foundUser = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Utente non trovato con id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Utente non trovato con id: " + id));
         // Converte l'entità trovata nel DTO di risposta
         return convertToResponseDto(foundUser);
     }
@@ -80,7 +81,7 @@ public class UserServiceImpl implements UserService
     {
         // Recupero utente dal DB tramite il suo id
         User userToUpdate = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Utente non trovato con id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Utente non trovato con id: " + id));
 
         String oldUsername = userToUpdate.getUsername();
         String newUsername = inputDto.getUsername();
@@ -113,7 +114,7 @@ public class UserServiceImpl implements UserService
     public void deleteUser(Long id)
     {
         User foundUser = userRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Utente non trovato con id: " + id));
+            .orElseThrow(() -> new ResourceNotFoundException("Utente non trovato con id: " + id));
 
         // Recupero di tutti i ruoli associati allo username di questo utente
         List<Role> rolesToDelete = roleRepository.findByUsername(foundUser.getUsername());

@@ -3,6 +3,7 @@ package com.academy.eventhub.controller;
 import com.academy.eventhub.dto.RegisterRequest;
 import com.academy.eventhub.entity.User;
 import com.academy.eventhub.service.AuthService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,10 +27,10 @@ public class AuthController
 
     // Punto 8 dello Step 2: Endpoint per gestire la registrazione di un nuovo utente
     @PostMapping("/signup")
-    public ResponseEntity<User> signup(@RequestBody RegisterRequest registerRequest)
+    public ResponseEntity<User> signup(@Valid @RequestBody RegisterRequest registerRequest)
     {
         // Chiamata servizio passando i dati estratti dal DTO
-        User registeredUser = authService.register(registerRequest.getUsername(), registerRequest.getPassword());
+        User registeredUser = authService.register(registerRequest);
 
         // Restituizione utente appena creato con lo stato HTTP 201 Created (best practice REST)
         return new ResponseEntity<>(registeredUser, HttpStatus.CREATED);
