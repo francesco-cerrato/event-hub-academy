@@ -57,6 +57,18 @@ public class Event
     @JoinColumn(name = "venue_id", nullable = false)
     private Venue venue;
 
+    /*
+        Dall'altro lato, nell'entity Speaker ossia l'entità inversa,
+        è codificata la relazione @ManyToMany.
+     */
+    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinTable(
+            name = "event_speakers",  // Nome della tabella di join
+            joinColumns = @JoinColumn( name = "event_id"), // Chiave esterna dell'entità corrente
+            inverseJoinColumns = @JoinColumn( name = "speaker_id") // Chiave esterna dell'altra entità
+    )
+    private Set<Speaker> speakers = new HashSet<>();
+
     public Event()
     {}
 
@@ -138,5 +150,13 @@ public class Event
 
     public void setVenue(Venue venue) {
         this.venue = venue;
+    }
+
+    public Set<Speaker> getSpeakers() {
+        return speakers;
+    }
+
+    public void setSpeakers(Set<Speaker> speakers) {
+        this.speakers = speakers;
     }
 }

@@ -32,11 +32,14 @@ public class EventRequestDto
     // Un set di ID dei tag associati (opzionale, può essere vuoto ma non null)
     private Set<Long> tagIds;
 
+    private Set<Long> speakerIds;
+
     public EventRequestDto()
     {}
 
     public EventRequestDto(String title, String description, LocalDateTime eventDate,
-                           BigDecimal price, BigDecimal vipPrice, Long venueId, Set<Long> tagIds) {
+                           BigDecimal price, BigDecimal vipPrice, Long venueId, Set<Long> tagIds,
+                           Set<Long> speakerIds) {
         this.title = title;
         this.description = description;
         this.eventDate = eventDate;
@@ -44,6 +47,7 @@ public class EventRequestDto
         this.vipPrice = vipPrice;
         this.venueId = venueId;
         this.tagIds = tagIds;
+        this.speakerIds = speakerIds;
     }
 
     public String getTitle() {
@@ -100,5 +104,13 @@ public class EventRequestDto
 
     public void setTagIds(Set<Long> tagIds) {
         this.tagIds = tagIds;
+    }
+
+    public Set<Long> getSpeakerIds() {
+        return speakerIds;
+    }
+
+    public void setSpeakerIds(Set<Long> speakerIds) {
+        this.speakerIds = speakerIds;
     }
 }

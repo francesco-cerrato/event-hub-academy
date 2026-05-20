@@ -3,15 +3,9 @@ package com.academy.eventhub.service;
 import com.academy.eventhub.dto.EventRequestDto;
 import com.academy.eventhub.dto.EventResponseDto;
 import com.academy.eventhub.dto.VenueResponseDto;
-import com.academy.eventhub.entity.Event;
-import com.academy.eventhub.entity.Tag;
-import com.academy.eventhub.entity.User;
-import com.academy.eventhub.entity.Venue;
+import com.academy.eventhub.entity.*;
 import com.academy.eventhub.exception.ResourceNotFoundException;
-import com.academy.eventhub.repository.EventRepository;
-import com.academy.eventhub.repository.TagRepository;
-import com.academy.eventhub.repository.UserRepository;
-import com.academy.eventhub.repository.VenueRepository;
+import com.academy.eventhub.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
@@ -31,15 +25,18 @@ public class EventServiceImpl implements EventService{
     private final UserRepository userRepository;
     private final VenueRepository venueRepository;
     private final TagRepository tagRepository;
+    private final SpeakerRepository speakerRepository;
 
     @Autowired
     public EventServiceImpl(EventRepository eventRepository, UserRepository userRepository,
-                            VenueRepository venueRepository, TagRepository tagRepository)
+                            VenueRepository venueRepository, TagRepository tagRepository,
+                            SpeakerRepository speakerRepository)
     {
         this.eventRepository = eventRepository;
         this.userRepository = userRepository;
         this.venueRepository = venueRepository;
         this.tagRepository = tagRepository;
+        this.speakerRepository = speakerRepository;
     }
 
     @Override
@@ -65,6 +62,11 @@ public class EventServiceImpl implements EventService{
         if (dto.getTagIds() != null && !dto.getTagIds().isEmpty()) {
             List<Tag> foundTags = tagRepository.findAllById(dto.getTagIds());
             newEvent.setTags(new HashSet<>(foundTags));
+        }
+
+        if (dto.getSpeakerIds() != null && !dto.getSpeakerIds().isEmpty()) {
+            List<Speaker> foundSpeakers = speakerRepository.findAllById(dto.getSpeakerIds());
+            newEvent.setSpeakers(new HashSet<>(foundSpeakers));
         }
 
         Event savedEvent = eventRepository.save(newEvent);
@@ -125,6 +127,12 @@ public class EventServiceImpl implements EventService{
             foundEvent.getTags().addAll(foundTags);
         }
 
+        if (dto.getSpeakerIds() != null) {
+            List<Speaker> foundSpeakers = speakerRepository.findAllById(dto.getSpeakerIds());
+            foundEvent.getSpeakers().clear();
+            foundEvent.getSpeakers().addAll(foundSpeakers);
+        }
+
         Event updatedEvent = eventRepository.save(foundEvent);
         return convertToResponseDto(updatedEvent);
     }
@@ -160,6 +168,10 @@ public class EventServiceImpl implements EventService{
                 .map(Tag::getName)
                 .collect(Collectors.toSet());
 
+        Set<String> speakerNames = event.getSpeakers().stream()
+                .map(Speaker::getName)
+                .collect(Collectors.toSet());
+
         EventResponseDto eventResponseDto = new EventResponseDto();
         eventResponseDto.setId(event.getId());
         eventResponseDto.setTitle(event.getTitle());
@@ -170,6 +182,7 @@ public class EventServiceImpl implements EventService{
         eventResponseDto.setOrganizerUsername(event.getOrganizer().getUsername());
         eventResponseDto.setVenue(venueDto);
         eventResponseDto.setTags(tagNames);
+        eventResponseDto.setSpeakers(speakerNames);
 
         return eventResponseDto;
     }

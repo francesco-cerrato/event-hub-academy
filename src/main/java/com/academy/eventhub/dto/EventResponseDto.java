@@ -15,6 +15,7 @@ public class EventResponseDto
     private String organizerUsername;
     private VenueResponseDto venue;
     private Set<String> tags;
+    private Set<String> speakers; // Conterrà i nomi dei relatori associati
 
     public EventResponseDto()
     {}
@@ -103,5 +104,13 @@ public class EventResponseDto
 
     public void setTags(Set<String> tags) {
         this.tags = tags;
+    }
+
+    public Set<String> getSpeakers() {
+        return speakers;
+    }
+
+    public void setSpeakers(Set<String> speakers) {
+        this.speakers = speakers;
     }
 }
