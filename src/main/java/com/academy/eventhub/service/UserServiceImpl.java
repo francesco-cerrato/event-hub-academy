@@ -1,6 +1,7 @@
 package com.academy.eventhub.service;
 
 import com.academy.eventhub.dto.UserResponseDto;
+import com.academy.eventhub.dto.UserRoleUpdateDto;
 import com.academy.eventhub.dto.UserUpdateDto;
 import com.academy.eventhub.entity.Role;
 import com.academy.eventhub.entity.User;
@@ -9,6 +10,7 @@ import com.academy.eventhub.repository.RoleRepository;
 import com.academy.eventhub.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -125,6 +127,35 @@ public class UserServiceImpl implements UserService
         }
 
         userRepository.delete(foundUser);
+    }
+
+    @Override
+    @Transactional
+    public UserResponseDto updateUserRole(Long id, UserRoleUpdateDto roleDto) {
+        User foundUser = userRepository.findById(id)
+                .orElseThrow( () -> new ResourceNotFoundException("Utente non trovato con id: " + id));
+
+        // Recupero lista ruoli associati ad uno specifico username
+        List<Role> currentRoles = roleRepository.findByUsername(foundUser.getUsername());
+
+        // Cancellazione vecchi ruoli per evitare duplicati
+        for (Role role : currentRoles) {
+            roleRepository.delete(role);
+        }
+
+        Role newRole = new Role();
+        newRole.setUsername(foundUser.getUsername());
+
+        // Verifica che il ruolo abbia il prefisso "ROLE_" se l'input non lo contiene
+        String formattedRole = roleDto.getRole().toUpperCase();
+        if (!formattedRole.startsWith("ROLE_")) {
+            formattedRole = "ROLE_" + formattedRole;
+        }
+        newRole.setAuthority(formattedRole);
+
+        roleRepository.save(newRole);
+
+        return convertToResponseDto(foundUser);
     }
 
     /*

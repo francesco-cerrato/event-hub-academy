@@ -45,7 +45,7 @@ public class UserController
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<UserResponseDto> deleteUser(@PathVariable Long id)
+    public ResponseEntity<Void> deleteUser(@PathVariable Long id)
     {
         userService.deleteUser(id);
         // Ritorna uno stato HTTP 204 No Content (operazione riuscita, nessun corpo)

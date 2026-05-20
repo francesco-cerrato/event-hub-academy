@@ -15,6 +15,7 @@ public class UserResponseDto
     private String username;
     // Contiene solo i nomi dei ruoli in formato stringa (Es. "ROLE_USER")
     private Set<String> roles;
+    private ProfileResponseDto profile; // Inclusione del profilo schermato dal DTO
     /*
         La password va nascosta quando si restituisce in output i dati di uno user
      */
@@ -53,5 +54,13 @@ public class UserResponseDto
 
     public void setRoles(Set<String> roles) {
         this.roles = roles;
+    }
+
+    public ProfileResponseDto getProfile() {
+        return profile;
+    }
+
+    public void setProfile(ProfileResponseDto profile) {
+        this.profile = profile;
     }
 }

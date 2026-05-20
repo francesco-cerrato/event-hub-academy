@@ -1,6 +1,9 @@
 package com.academy.eventhub.controller;
 
+import com.academy.eventhub.dto.ProfileResponseDto;
 import com.academy.eventhub.dto.RegisterRequest;
+import com.academy.eventhub.dto.UserResponseDto;
+import com.academy.eventhub.entity.Profile;
 import com.academy.eventhub.entity.User;
 import com.academy.eventhub.service.AuthService;
 import jakarta.validation.Valid;
@@ -27,12 +30,37 @@ public class AuthController
 
     // Punto 8 dello Step 2: Endpoint per gestire la registrazione di un nuovo utente
     @PostMapping("/signup")
-    public ResponseEntity<User> signup(@Valid @RequestBody RegisterRequest registerRequest)
+    public ResponseEntity<UserResponseDto> signup(@Valid @RequestBody RegisterRequest registerRequest)
     {
         // Chiamata servizio passando i dati estratti dal DTO
         User registeredUser = authService.register(registerRequest);
 
+        UserResponseDto responseDto = convertToResponseDto(registeredUser);
+
         // Restituizione utente appena creato con lo stato HTTP 201 Created (best practice REST)
-        return new ResponseEntity<>(registeredUser, HttpStatus.CREATED);
+        return new ResponseEntity<>(responseDto, HttpStatus.CREATED);
+    }
+
+    UserResponseDto convertToResponseDto(User registeredUser)
+    {
+        UserResponseDto userResponseDto = new UserResponseDto();
+        userResponseDto.setId(registeredUser.getId());
+        userResponseDto.setUsername(registeredUser.getUsername());
+
+        // Mappatura sicura del profilo per evitare ricorsione ciclica
+        if (registeredUser.getProfile() != null) {
+            Profile profileEntity = registeredUser.getProfile();
+            ProfileResponseDto profileDto = new ProfileResponseDto();
+            profileDto.setId(profileEntity.getId());
+            profileDto.setFirstName(profileEntity.getFirstName());
+            profileDto.setLastName(profileEntity.getLastName());
+            profileDto.setBio(profileEntity.getBio());
+            profileDto.setCity(profileEntity.getCity());
+            profileDto.setAvatarUrl(profileEntity.getAvatarUrl());
+
+            userResponseDto.setProfile(profileDto);
+        }
+
+        return userResponseDto;
     }
 }
