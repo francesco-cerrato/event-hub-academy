@@ -2,6 +2,9 @@ package com.academy.eventhub.entity;
 
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name = "venues")
 public class Venue
@@ -31,9 +34,8 @@ public class Venue
         cascade = CascadeType.ALL: Qualsiasi operazione (salvataggio, aggiornamento, cancellazione) effettuata su questa entità si riflette automaticamente su tutti gli eventi associati.
         fetch = FetchType.LAZY: Gli eventi associati vengono caricati dal database solo quando si accede esplicitamente alla lista (es. tramite getEvents()), ottimizzando le prestazioni.
      */
-    // Questo punterà al campo @ManyToOne di Event chiamato event
-    //@OneToMany(mappedBy = "venue", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    //private List<Event> events;
+    @OneToMany(mappedBy = "venue", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Event> events = new ArrayList<>();
 
     public Venue()
     {}
@@ -74,5 +76,13 @@ public class Venue
 
     public void setCapacity(int capacity) {
         this.capacity = capacity;
+    }
+
+    public List<Event> getEvents() {
+        return events;
+    }
+
+    public void setEvents(List<Event> events) {
+        this.events = events;
     }
 }

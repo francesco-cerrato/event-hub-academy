@@ -2,6 +2,7 @@ package com.academy.eventhub.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -66,9 +67,17 @@ public class SecurityConfig
                 // Permette l'accesso alla gestione degli errori di Spring per non nascondere i 404
                 .requestMatchers("/error").permitAll()
 
+                // Tutti possono leggere gli eventi (GET è pubblico)
+                .requestMatchers(HttpMethod.GET,"/api/events/**").permitAll()
+
+                // Solo gli ORGANIZER possono creare, modificare o eliminare eventi. Qualunque altra operazione oltre alla GET
+                .requestMatchers("/api/events/**").hasRole("ORGANIZER")
+
                 // PUNTO 6 STEP 3: Limita tutti i path che iniziano con /admin/ solo agli utenti ADMIN
                 // Nota: Cerca il ruolo 'ROLE_ADMIN' nel DB, ma nel metodo si scrive solo 'ADMIN'
                 .requestMatchers("/admin/**").hasRole("ADMIN")
+
+
 
 
                 // Qualsiasi altra richiesta dell'applicazione richiederà il login obbligatorio

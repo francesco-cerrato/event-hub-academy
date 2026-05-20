@@ -2,6 +2,9 @@ package com.academy.eventhub.entity;
 
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name = "users")
 public class User
@@ -33,6 +36,10 @@ public class User
     // Relazione 1-1 inversa: fa riferimento al campo 'user' presente nella classe Profile
     @OneToOne (mappedBy = "user", cascade = CascadeType.ALL)
     private Profile profile;
+
+    // Relazione 1-N: fa riferimento al campo "organizer" presente nella classe Event
+    @OneToMany(mappedBy = "organizer", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Event> organizedEvents = new ArrayList<>();
 
     // Costruttore vuoto per JPA
     public User()
@@ -86,6 +93,14 @@ public class User
 
     public void setProfile(Profile profile) {
         this.profile = profile;
+    }
+
+    public List<Event> getOrganizedEvents() {
+        return organizedEvents;
+    }
+
+    public void setOrganizedEvents(List<Event> organizedEvents) {
+        this.organizedEvents = organizedEvents;
     }
 
     @Override
