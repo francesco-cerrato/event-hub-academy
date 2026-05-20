@@ -11,7 +11,13 @@ public interface EventService
     EventResponseDto createEvent(EventRequestDto dto, String currentUsername);
 
     EventResponseDto getEventById(Long id);
-    List<EventResponseDto> getAllEvents();
+
+    // Precendemente, prima di aggiungere i filtri opzionali (specification) c'era questo metodo:
+    //List<EventResponseDto> getAllEvents();
+    // Il nuovo metodo, utile per le specification, è il seguente:
+    List<EventResponseDto> getAllEvents(java.time.LocalDate date, Long venueId, String organizer, String tag);
+
+
 
     // Accetta l'utente loggato per verificare che sia il vero proprietario dell'evento
     EventResponseDto updateEvent(Long id, EventRequestDto dto, String currentUsername);

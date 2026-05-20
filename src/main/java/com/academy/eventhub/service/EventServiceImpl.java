@@ -83,7 +83,18 @@ public class EventServiceImpl implements EventService{
         return convertToResponseDto(foundEvent);
     }
 
+
+    /*
+    Precedenemente, prima dell'aggiunta delle specification e dunque della modifica
+    del metodo "getAllEvents()", era utile il metodo sottostante.
+
+    La nuova versione del metodo "getAllEvents()" contiene le specification
+    per poter filtrare gli eventi in base ad un data specifica, in base alla sede
+    specifica, in base allo username dell'organizzatore e in base al nome
+    di un Tag
+
     @Override
+
     @Transactional(readOnly = true)
     public List<EventResponseDto> getAllEvents()
     {
@@ -97,6 +108,35 @@ public class EventServiceImpl implements EventService{
 
         return dtoList;
     }
+    */
+
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<EventResponseDto> getAllEvents(java.time.LocalDate date, Long venueId, String organizer, String tag)
+    {
+        // Creazione della specifica di base partendo dalla prima (hasDate)
+        org.springframework.data.jpa.domain.Specification<Event> spec =
+                com.academy.eventhub.specification.EventSpecifications.hasDate(date);
+
+        // Concatenazione  delle altre in cascata usando l'operatore fluente .and()
+        spec = spec.and(com.academy.eventhub.specification.EventSpecifications.hasVenueId(venueId))
+                .and(com.academy.eventhub.specification.EventSpecifications.hasOrganizerUsername(organizer))
+                .and(com.academy.eventhub.specification.EventSpecifications.hasTagName(tag));
+
+        // Esecuzione della query dinamica sul database sfruttando il JpaSpecificationExecutor
+        List<Event> eventList = eventRepository.findAll(spec);
+        List<EventResponseDto> dtoList = new ArrayList<>();
+
+        for (Event event : eventList)
+        {
+            dtoList.add(convertToResponseDto(event));
+        }
+
+        return dtoList;
+    }
+
+
 
     @Override
     @Transactional

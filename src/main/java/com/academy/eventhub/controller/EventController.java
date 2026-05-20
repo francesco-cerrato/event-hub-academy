@@ -33,10 +33,33 @@ public class EventController
         this.eventService = eventService;
     }
 
+    /*
     @GetMapping
     public ResponseEntity<List<EventResponseDto>> getAllEvents()
     {
         List<EventResponseDto> eventList = eventService.getAllEvents();
+        return ResponseEntity.ok(eventList);
+    }
+
+    Metodo "getAllEvents()" precedete all'inserimento delle specification (filtri)
+
+     */
+
+    @GetMapping
+    public ResponseEntity<List<EventResponseDto>> getAllEvents(
+            /*
+                Si utilizza l'annotazione @RequestParam(required = false) in modo che
+                tutti i filtri siano opzionali.
+                Se l'utente non li passa nella richiesta,
+                Spring assegnerà null e mostrerà l'intera lista senza filtri.
+             */
+            @RequestParam(required = false) @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE) java.time.LocalDate date,
+            @RequestParam(required = false) Long venueId,
+            @RequestParam(required = false) String organizer,
+            @RequestParam(required = false) String tag)
+    {
+        // Passiamo tutti i parametri opzionali al service per la query dinamica
+        List<EventResponseDto> eventList = eventService.getAllEvents(date, venueId, organizer, tag);
         return ResponseEntity.ok(eventList);
     }
 
