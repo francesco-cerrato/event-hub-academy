@@ -59,8 +59,10 @@ public class SecurityConfig
         // Disabilitazione CSRF (Cross-Site Request Forgery)
         http.csrf(csrf -> csrf.disable());
 
-
-        // Configurazione delle regole di autorizzazione per le chiamate HTTP
+        /*
+            Configurazione delle regole di autorizzazione per le chiamate HTTP
+            le regole più specifiche vanno messe sempre prima di quelle più generiche
+         */
         http.authorizeHttpRequests(auth -> auth
                 // Permesso a chiunque, anche non loggato, di fare la registrazione
                 .requestMatchers("/auth/signup").permitAll()
@@ -70,12 +72,24 @@ public class SecurityConfig
                 // Tutti possono leggere gli eventi (GET è pubblico)
                 .requestMatchers(HttpMethod.GET,"/api/events/**").permitAll()
 
-                // Solo gli ORGANIZER possono creare, modificare o eliminare eventi. Qualunque altra operazione oltre alla GET
-                .requestMatchers("/api/events/**").hasRole("ORGANIZER")
+                /*
+                    REGOLA AGGIUNTA PER LO STEP 7: Consente la prenotazione sia a USER che a ORGANIZER
+                    Va inserita PRIMA della regola generica sui blocchi degli eventi, altrimenti viene sovrascritta!
+                 */
+                .requestMatchers(HttpMethod.POST, "/api/events/{id}/book").hasAnyRole("USER", "ORGANIZER", "ADMIN")
+
+
+                // Regole specifiche per la gestione degli eventi (Solo per gli ORGANIZER)
+                .requestMatchers(HttpMethod.POST, "/api/events").hasRole("ORGANIZER")
+                .requestMatchers(HttpMethod.PUT, "/api/events/**").hasRole("ORGANIZER")
+                .requestMatchers(HttpMethod.DELETE, "/api/events/**").hasRole("ORGANIZER")
+
+
 
                 // PUNTO 6 STEP 3: Limita tutti i path che iniziano con /admin/ solo agli utenti ADMIN
                 // Nota: Cerca il ruolo 'ROLE_ADMIN' nel DB, ma nel metodo si scrive solo 'ADMIN'
                 .requestMatchers("/admin/**").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.DELETE, "/api/tickets/**").hasAnyRole("USER", "ORGANIZER", "ADMIN")
 
 
 

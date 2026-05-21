@@ -2,7 +2,11 @@ package com.academy.eventhub.controller;
 
 import com.academy.eventhub.dto.EventRequestDto;
 import com.academy.eventhub.dto.EventResponseDto;
+import com.academy.eventhub.dto.TicketRequestDto;
+import com.academy.eventhub.dto.TicketResponseDto;
+import com.academy.eventhub.entity.Ticket;
 import com.academy.eventhub.service.EventService;
+import com.academy.eventhub.service.TicketService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -26,11 +30,13 @@ public class EventController
      */
 
     private final EventService eventService;
+    private final TicketService ticketService; // Iniettato per gestire la prenotazione dei biglietti
 
     @Autowired
-    public EventController(EventService eventService)
+    public EventController(EventService eventService, TicketService ticketService)
     {
         this.eventService = eventService;
+        this.ticketService = ticketService;
     }
 
     /*
@@ -91,6 +97,26 @@ public class EventController
     {
         eventService.deleteEvent(id, principal.getName());
         return ResponseEntity.noContent().build();
+    }
+
+    /*
+       DIFFERENZA TRA I CONTROLLER:
+         Questo endpoint POST viene inserito in EventController perché la struttura dell'URL
+         richiesta dalla traccia è "/events/{id}/book". Logicamente, l'azione di prenotazione
+         nasce come un'operazione contestuale a uno specifico evento.
+
+         L'endpoint di eliminazione della prenotazione ("DELETE /tickets/{id}") viene invece
+         implementato all'interno di un TicketController separato. Questo perché la cancellazione
+         agisce in modo mirato e isolato sulla singola risorsa del Ticket, svincolata dal percorso
+         dell'evento.
+    */
+
+    @PostMapping("/{id}/book") // si aggancia a /api/events diventando /api/events/{id}/book
+    public ResponseEntity<TicketResponseDto> createTicket(@PathVariable Long id, @Valid @RequestBody TicketRequestDto dto,
+                                               Principal principal)
+    {
+        TicketResponseDto createdTicket = ticketService.createTicket(id, dto, principal.getName());
+        return new ResponseEntity<>(createdTicket, HttpStatus.CREATED);
     }
 
 }

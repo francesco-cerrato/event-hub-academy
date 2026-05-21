@@ -18,10 +18,12 @@ public interface EventService
     List<EventResponseDto> getAllEvents(java.time.LocalDate date, Long venueId, String organizer, String tag);
 
 
-
     // Accetta l'utente loggato per verificare che sia il vero proprietario dell'evento
     EventResponseDto updateEvent(Long id, EventRequestDto dto, String currentUsername);
 
     // Accetta l'utente loggato per motivi di sicurezza sulla cancellazione
     void deleteEvent(Long id, String currentUsername);
+
+    // Calcola i posti ancora disponibili per un determinato evento
+    int getAvailableSeats(Long eventId);
 }

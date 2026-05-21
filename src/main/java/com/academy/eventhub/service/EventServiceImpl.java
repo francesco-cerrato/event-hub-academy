@@ -26,17 +26,19 @@ public class EventServiceImpl implements EventService{
     private final VenueRepository venueRepository;
     private final TagRepository tagRepository;
     private final SpeakerRepository speakerRepository;
+    private final TicketRepository ticketRepository;
 
     @Autowired
     public EventServiceImpl(EventRepository eventRepository, UserRepository userRepository,
                             VenueRepository venueRepository, TagRepository tagRepository,
-                            SpeakerRepository speakerRepository)
+                            SpeakerRepository speakerRepository, TicketRepository ticketRepository)
     {
         this.eventRepository = eventRepository;
         this.userRepository = userRepository;
         this.venueRepository = venueRepository;
         this.tagRepository = tagRepository;
         this.speakerRepository = speakerRepository;
+        this.ticketRepository = ticketRepository;
     }
 
     @Override
@@ -190,6 +192,33 @@ public class EventServiceImpl implements EventService{
         }
 
         eventRepository.delete(foundEvent);
+    }
+
+    @Override
+    public int getAvailableSeats(Long eventId)
+    {
+        // Selezione di un evento in base al suo id specifico
+        Event foundEvent = eventRepository.findById(eventId)
+                .orElseThrow( () -> new ResourceNotFoundException("Evento non trovato con id: " + eventId) );
+
+        // Dato l'evento trovato, si contano, nella tabella tickets, quanti ticket sono "ACTIVE" per l'evento
+        long activeTickets = ticketRepository.countByEventIdAndStatus(eventId, TicketStatus.ACTIVE);
+
+        // Recupero dell'intera capacity (capienza) dello specifico evento trovato
+        int capacity = foundEvent.getVenue().getCapacity();
+
+        // Calcolo dei posti disponibili: capienza totale - biglietti attivi
+        int avaiableSeats = capacity - (int) activeTickets;
+
+        return avaiableSeats;
+
+
+        /*
+        n   on serve nessun DTO per questo metodo.
+        Restituire un tipo primitivo int a livello di Service
+        è la scelta più pulita e corretta, perché si tratta
+        di un calcolo aritmetico interno alla logica di business.
+         */
     }
 
 
