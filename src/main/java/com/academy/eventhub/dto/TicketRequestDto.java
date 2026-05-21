@@ -2,6 +2,7 @@ package com.academy.eventhub.dto;
 
 import com.academy.eventhub.entity.TicketType;
 import com.academy.eventhub.entity.User;
+import jakarta.validation.constraints.NotNull;
 
 /*
     In questo caso, il TicketRequestDto contiene solamente il type in quanto
@@ -17,6 +18,7 @@ import com.academy.eventhub.entity.User;
  */
 public class TicketRequestDto
 {
+    @NotNull(message = "Il tipo di biglietto è obbligatorio (STANDARD o VIP)")
     private TicketType type;
 
     public TicketRequestDto()

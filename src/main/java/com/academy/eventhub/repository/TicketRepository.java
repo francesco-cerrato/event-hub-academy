@@ -18,4 +18,8 @@ public interface TicketRepository extends JpaRepository<Ticket, Long>
         SELECT COUNT(*) FROM Ticket WHERE EventId = ? AND status = ?
      */
     long countByEventIdAndStatus(Long eventId, TicketStatus status);
+
+
+    // Verifica se esiste già un ticket ATTIVO associato a uno specifico utente e a uno specifico evento
+    boolean existsByUserIdAndEventIdAndStatus(Long userId, Long eventId, TicketStatus status);
 }

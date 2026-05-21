@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Service
 public class TicketServiceImpl implements TicketService
@@ -44,6 +45,19 @@ public class TicketServiceImpl implements TicketService
                 .orElseThrow( () -> new ResourceNotFoundException("Utente non trovato con username: " + currentUsername));
 
 
+        // Controllo che il Ticket da prenotare non appartenga (relazione) ad un evento svolto nel passato. Step 8 punto 1
+        if (foundEvent.getEventDate().isBefore(LocalDateTime.now()))
+        {
+            throw new IllegalStateException("Impossibile prenotare: l'evento è già iniziato o si è concluso.");
+        }
+
+        // 4. Controllo doppia prenotazione. Step 8 punto 2
+        if (ticketRepository.existsByUserIdAndEventIdAndStatus(foundUser.getId(), eventId, TicketStatus.ACTIVE))
+        {
+            throw new IllegalStateException("Hai già una prenotazione attiva per questo evento. Non puoi prenotare due volte.");
+        }
+
+
         // Verifica posti disponibili
         int seatsLeft = eventService.getAvailableSeats(eventId);
         if (seatsLeft <= 0)
@@ -71,6 +85,7 @@ public class TicketServiceImpl implements TicketService
         newTicket.setType(ticketRequestDto.getType());
         newTicket.setPricePaid(finalPrice);
 
+
         // Salvataggio del ticket nel DB
         Ticket savedTicket = ticketRepository.save(newTicket);
 
@@ -90,6 +105,14 @@ public class TicketServiceImpl implements TicketService
         if (!foundTicket.getUser().getUsername().equals(currentUsername)) {
             throw new IllegalArgumentException("Non sei autorizzato a cancellare questa prenotazione.");
         }
+
+        // Controllo per verificare che l'evento non sia già iniziato (4 regole di business, punto 4)
+        if (foundTicket.getEvent().getEventDate().isBefore(LocalDateTime.now()))
+        {
+            throw new IllegalStateException("Impossibile cancellare la prenotazione: l'evento è già iniziato o si è concluso.");
+        }
+
+
 
         // Cancellazione logica impostando lo stato su CANCELLED
         foundTicket.setStatus(TicketStatus.CANCELLED);

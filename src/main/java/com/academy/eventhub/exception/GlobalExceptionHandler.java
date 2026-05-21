@@ -80,4 +80,44 @@ public class GlobalExceptionHandler
 
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
+
+    /*
+       Gestione delle violazioni delle regole di business (Punti 5 e 6 dello Step 8).
+       Intercetta le IllegalStateException (es. posti esauriti, doppia prenotazione, evento passato).
+       Restituisce un codice di stato HTTP 409 Conflict.
+    */
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<ErrorResponse> handleIllegalStateException(
+            IllegalStateException exception, WebRequest request)
+    {
+        ErrorResponse errorResponse = new ErrorResponse(
+                LocalDateTime.now(),
+                HttpStatus.CONFLICT.value(),                 // 409
+                HttpStatus.CONFLICT.getReasonPhrase(),        // "Conflict"
+                exception.getMessage(),                      // Messaggio dettagliato del Service
+                request.getDescription(false)
+        );
+
+        return new ResponseEntity<>(errorResponse, HttpStatus.CONFLICT);
+    }
+
+    /*
+        Gestione degli argomenti non validi o tentativi di accesso non autorizzati a livello logico.
+        Intercetta le IllegalArgumentException (es. utente che prova a cancellare un ticket non suo).
+        Restituisce un codice di stato HTTP 400 Bad Request.
+     */
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ErrorResponse> handleIllegalArgumentException(
+            IllegalArgumentException exception, WebRequest request)
+    {
+        ErrorResponse errorResponse = new ErrorResponse(
+                LocalDateTime.now(),
+                HttpStatus.BAD_REQUEST.value(),              // 400
+                HttpStatus.BAD_REQUEST.getReasonPhrase(),     // "Bad Request"
+                exception.getMessage(),                      // Messaggio di errore
+                request.getDescription(false)
+        );
+
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
 }

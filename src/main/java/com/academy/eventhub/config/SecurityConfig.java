@@ -3,6 +3,7 @@ package com.academy.eventhub.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -99,6 +100,24 @@ public class SecurityConfig
 
         // Attivazione dell'autenticazione standard HTTP Basic (Username e Password nell'header)
         http.httpBasic(Customizer.withDefaults());
+
+
+        // Gestione centralizzata dell'accesso negato (Punto 6 dello Step 8 - Errore 403)
+        http.exceptionHandling(exception -> exception
+                .accessDeniedHandler((request, response, accessDeniedException) -> {
+                    response.setStatus(HttpStatus.FORBIDDEN.value()); // 403
+                    response.setContentType("application/json");
+                    response.setCharacterEncoding("UTF-8");
+
+                    String jsonResponse = String.format(
+                            "{\"timestamp\":\"%s\",\"status\":403,\"error\":\"Forbidden\",\"message\":\"Non hai i permessi necessari per accedere a questa risorsa.\",\"path\":\"%s\"}",
+                            java.time.LocalDateTime.now(), request.getRequestURI()
+                    );
+
+                    response.getWriter().write(jsonResponse);
+                })
+        );
+
 
         return http.build();
     }
