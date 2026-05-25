@@ -41,6 +41,11 @@ public class User
     @OneToMany(mappedBy = "organizer", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Event> organizedEvents = new ArrayList<>();
 
+    // Relazione 1-N inversa: fa riferimento al campo "user" presente nella classe Feedback
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Feedback> feedbacks = new ArrayList<>();
+
+
     // Costruttore vuoto per JPA
     public User()
     {
@@ -101,6 +106,14 @@ public class User
 
     public void setOrganizedEvents(List<Event> organizedEvents) {
         this.organizedEvents = organizedEvents;
+    }
+
+    public List<Feedback> getFeedbacks() {
+        return feedbacks;
+    }
+
+    public void setFeedbacks(List<Feedback> feedbacks) {
+        this.feedbacks = feedbacks;
     }
 
     @Override

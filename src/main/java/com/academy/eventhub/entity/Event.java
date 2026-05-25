@@ -4,7 +4,9 @@ import jakarta.persistence.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 
@@ -68,6 +70,15 @@ public class Event
             inverseJoinColumns = @JoinColumn( name = "speaker_id") // Chiave esterna dell'altra entità
     )
     private Set<Speaker> speakers = new HashSet<>();
+
+    // Richiesto per lo Step 9: Feedback ricevuti dall'evento
+    @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Feedback> feedbacks = new ArrayList<>();
+
+    // Richiesto per lo Step 7 e 8: Biglietti staccati per l'evento
+    @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Ticket> tickets = new ArrayList<>();
+
 
     public Event()
     {}
@@ -158,5 +169,21 @@ public class Event
 
     public void setSpeakers(Set<Speaker> speakers) {
         this.speakers = speakers;
+    }
+
+    public List<Feedback> getFeedbacks() {
+        return feedbacks;
+    }
+
+    public void setFeedbacks(List<Feedback> feedbacks) {
+        this.feedbacks = feedbacks;
+    }
+
+    public List<Ticket> getTickets() {
+        return tickets;
+    }
+
+    public void setTickets(List<Ticket> tickets) {
+        this.tickets = tickets;
     }
 }
