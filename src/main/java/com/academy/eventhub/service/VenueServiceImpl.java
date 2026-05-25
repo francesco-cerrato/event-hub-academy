@@ -90,7 +90,7 @@ public class VenueServiceImpl implements VenueService
 
     }
 
-    public VenueResponseDto convertToResponseDto(Venue venue)
+    private VenueResponseDto convertToResponseDto(Venue venue)
     {
         VenueResponseDto venueResponseDto = new VenueResponseDto();
         venueResponseDto.setId(venue.getId());

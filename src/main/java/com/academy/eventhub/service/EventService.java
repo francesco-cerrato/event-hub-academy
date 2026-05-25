@@ -2,8 +2,10 @@ package com.academy.eventhub.service;
 
 import com.academy.eventhub.dto.EventRequestDto;
 import com.academy.eventhub.dto.EventResponseDto;
+import org.springframework.data.domain.Page; // IMPORT CORRETTO
+import org.springframework.data.domain.Pageable; // IMPORT CORRETTO
 
-import java.util.List;
+import java.time.LocalDate;
 
 public interface EventService
 {
@@ -14,8 +16,9 @@ public interface EventService
 
     // Precendemente, prima di aggiungere i filtri opzionali (specification) c'era questo metodo:
     //List<EventResponseDto> getAllEvents();
+    // Nota che come parametro è presente "Pageable" per paginazione e ordinamento nello Step 10
     // Il nuovo metodo, utile per le specification, è il seguente:
-    List<EventResponseDto> getAllEvents(java.time.LocalDate date, Long venueId, String organizer, String tag);
+    Page<EventResponseDto> getAllEvents(java.time.LocalDate date, Long venueId, String organizer, String tag, Pageable pageable);
 
 
     // Accetta l'utente loggato per verificare che sia il vero proprietario dell'evento

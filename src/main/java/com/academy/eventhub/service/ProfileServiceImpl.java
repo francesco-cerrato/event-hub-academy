@@ -88,7 +88,7 @@ public class ProfileServiceImpl implements ProfileService{
         return convertToResponseDto(updatedProfile);
     }
 
-    public ProfileResponseDto convertToResponseDto(Profile profile)
+    private ProfileResponseDto convertToResponseDto(Profile profile)
     {
         ProfileResponseDto profileResponseDto = new ProfileResponseDto();
         profileResponseDto.setId(profile.getId());

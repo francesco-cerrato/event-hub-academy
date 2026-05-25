@@ -6,6 +6,10 @@ import com.academy.eventhub.dto.UserResponseDto;
 import com.academy.eventhub.entity.Profile;
 import com.academy.eventhub.entity.User;
 import com.academy.eventhub.service.AuthService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/auth") // rotta base per l'autenticazione
+@Tag(name = "Authentication", description = "Endpoint per la registrazione di nuovi utenti nel sistema")
 public class AuthController
 {
     private final AuthService authService;
@@ -29,6 +34,14 @@ public class AuthController
 
 
     // Punto 8 dello Step 2: Endpoint per gestire la registrazione di un nuovo utente
+    @Operation(
+            summary = "Registra un nuovo utente",
+            description = "Crea un nuovo account nel sistema (USER, ORGANIZER O ADMIN) applicando l'algoritmo di cifratura BCrypt sulla password."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Utente registrato con successo"),
+            @ApiResponse(responseCode = "400", description = "Dati di input non validi o username già esistente")
+    })
     @PostMapping("/signup")
     public ResponseEntity<UserResponseDto> signup(@Valid @RequestBody RegisterRequest registerRequest)
     {

@@ -87,7 +87,7 @@ public class SpeakerServiceImpl implements SpeakerService
     }
 
     // Helper interno per mappare l'Entity nel DTO di risposta
-    public SpeakerResponseDto convertToResponseDto(Speaker speaker)
+    private SpeakerResponseDto convertToResponseDto(Speaker speaker)
     {
         SpeakerResponseDto speakerResponseDto = new SpeakerResponseDto();
         speakerResponseDto.setId(speaker.getId());

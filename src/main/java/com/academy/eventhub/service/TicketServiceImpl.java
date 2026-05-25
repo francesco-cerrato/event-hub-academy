@@ -128,7 +128,7 @@ public class TicketServiceImpl implements TicketService
          */
     }
 
-    public TicketResponseDto convertToResponseDto(Ticket ticket)
+    private TicketResponseDto convertToResponseDto(Ticket ticket)
     {
         TicketResponseDto ticketResponseDto = new TicketResponseDto();
 

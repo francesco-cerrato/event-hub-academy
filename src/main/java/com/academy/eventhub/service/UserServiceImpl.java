@@ -162,7 +162,7 @@ public class UserServiceImpl implements UserService
         Metodo di utilità interno (Helper) incaricato di mappare un'entità JPA User
         in un oggetto di trasporto sicuro UserResponseDto.
      */
-    public UserResponseDto convertToResponseDto(User user)
+    private UserResponseDto convertToResponseDto(User user)
     {
         // Interroga la tabella authorities tramite il RoleRepository usando lo username dell'utente
         List<Role> userRoles = roleRepository.findByUsername(user.getUsername());

@@ -7,9 +7,12 @@ import com.academy.eventhub.entity.*;
 import com.academy.eventhub.exception.ResourceNotFoundException;
 import com.academy.eventhub.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -115,7 +118,7 @@ public class EventServiceImpl implements EventService{
 
     @Override
     @Transactional(readOnly = true)
-    public List<EventResponseDto> getAllEvents(java.time.LocalDate date, Long venueId, String organizer, String tag)
+    public Page<EventResponseDto> getAllEvents(java.time.LocalDate date, Long venueId, String organizer, String tag, Pageable pageable)
     {
         // Creazione della specifica di base partendo dalla prima (hasDate)
         org.springframework.data.jpa.domain.Specification<Event> spec =
@@ -126,16 +129,18 @@ public class EventServiceImpl implements EventService{
                 .and(com.academy.eventhub.specification.EventSpecifications.hasOrganizerUsername(organizer))
                 .and(com.academy.eventhub.specification.EventSpecifications.hasTagName(tag));
 
+        // Questa porzione di codice (2 righe) era utilizzata prima di aggiornare con Pageable
         // Esecuzione della query dinamica sul database sfruttando il JpaSpecificationExecutor
-        List<Event> eventList = eventRepository.findAll(spec);
-        List<EventResponseDto> dtoList = new ArrayList<>();
+        //List<Event> eventList = eventRepository.findAll(spec);
+        //List<EventResponseDto> dtoList = new ArrayList<>();
 
-        for (Event event : eventList)
-        {
-            dtoList.add(convertToResponseDto(event));
-        }
+        // Esecuzione della query dinamica passando sia la Spec che il Pageable.
+        // JpaSpecificationExecutor fornisce nativamente questo overload che restituisce una Page<Event>.
+        org.springframework.data.domain.Page<Event> eventPage = eventRepository.findAll(spec, pageable);
 
-        return dtoList;
+        // Trasformazione immediata della Page di Entity in Page di DTO tramite il convertToResponseDto.
+        // Il costrutto Lambda si aggancia perfettamente al tuo metodo helper esistente.
+        return eventPage.map(event -> this.convertToResponseDto(event));
     }
 
 
@@ -223,7 +228,7 @@ public class EventServiceImpl implements EventService{
 
 
     // Helper per convertire l'Entity in DTO riutilizzando i vecchi convertitori
-    public EventResponseDto convertToResponseDto(Event event)
+    private EventResponseDto convertToResponseDto(Event event)
     {
 
         VenueResponseDto venueDto = new VenueResponseDto(
