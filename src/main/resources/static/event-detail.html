@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+
+<html>
+
+    <head>
+        <meta charset="UTF-8">
+        <title> EventHub - Dettaglio Evento </title>
+        <link rel="stylesheet" href="css/style.css">
+    </head>
+
+    <body>
+
+        <header>
+            <nav>
+                <a href="index.html"> <strong> EventHub </strong></a>
+                <div class="nav-links"> 
+                    <a href="login.html" id="navLogin"> Login </a>
+                    <a href="signup.html" id="navSignup"> Registrati </a>
+                    <a href="events.html" id="navEvents"> Eventi </a>
+                    <a href="my-bookings.html" id="navBookings"> Le mie prenotazioni </a>
+                    <a href="profile.html" id="navProfile"> Profilo </a>
+                    <a href="organizer-events.html" id="navOrganizer"> Gestione eventi </a>
+                    <a href="admin.html" id="navAdmin"> Pannello Admin </a>
+                    <a href="#" id="navLogout" onclick="logout()"> Logout </a>
+                </div>
+            </nav>
+        </header>            
+
+        <main>
+            <!-- Contenitore dinamico per i dettagli dell'evento (Punto 6) -->
+            <section id="eventDetailContainer">
+                <p> Caricamento dettagli in corso... </p>
+            </section>
+
+            <!-- Spazio per il Form di Prenotazione -->
+            <section id="bookingSection" class="hidden" style="margin-top: 30px; padding: 20px; border: 1px solid #000;">
+                
+            </section>
+        </main>
+
+        <footer>
+            <p>&copy; 2026 EventHub — Progetto Finale Academy</p>
+        </footer>
+
+        <script src="js/auth.js"></script>
+        <script src="js/event-detail.js"></script>
+        
+    </body>
+
+</html>

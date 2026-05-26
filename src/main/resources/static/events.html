@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+
+<html>
+
+    <head>
+        <meta charset="UTF-8">
+        <title> EventHub - Lista Eventi </title>
+        <link rel="stylesheet" href="css/style.css">
+    </head>
+
+    <body>
+
+        <header>
+            <nav>
+                <a href="index.html"> <strong> EventHub </strong></a>
+                <div class="nav-links"> 
+                    <a href="login.html" id="navLogin"> Login </a>
+                    <a href="signup.html" id="navSignup"> Registrati </a>
+                    <a href="events.html" id="navEvents"> Eventi </a>
+                    <a href="my-bookings.html" id="navBookings"> Le mie prenotazioni </a>
+                    <a href="profile.html" id="navProfile"> Profilo </a>
+                    <a href="organizer-events.html" id="navOrganizer"> Gestione eventi </a>
+                    <a href="admin.html" id="navAdmin"> Pannello Admin </a>
+                    <a href="#" id="navLogout" onclick="logout()"> Logout </a>
+                </div>
+            </nav>
+        </header>            
+
+        <main>
+                <h1> Lista Eventi Disponibili </h1>
+
+            <!-- Sezione dei Filtri (Punti 3 e 4 dello Step 12) -->
+            <section id="filtersSection" style="margin-bottom: 20px; padding: 10px; border: 1px solid #000;">
+                <h3> Filtra Eventi </h3>
+                <label for="filterDate"> Data: </label>
+                <input type="date" id="filterDate">
+                
+                <label for="filterTag" style="margin-left: 15px;"> Tag: </label>
+                <input type="text" id="filterTag" placeholder="Es. Rock, Tech...">
+                
+                <button id="btnApplyFilters" style="margin-left: 15px; padding: 2px 10px;"> Applica </button>
+                <button id="btnResetFilters" style="margin-left: 5px; padding: 2px 10px;"> Resetta </button>
+            </section>
+
+            <!-- Contenitore dinamico dove JavaScript appenderà gli eventi (Punto 2) -->
+            <section id="eventsContainer">
+                <p> Caricamento eventi in corso... </p>
+            </section>
+        </main>
+
+        <footer>
+            <p>&copy; 2026 EventHub — Progetto Finale Academy</p>
+        </footer>
+
+        <script src="js/auth.js"></script>
+        <script src="js/events.js"></script>
+        
+    </body>
+
+</html>

@@ -3,6 +3,7 @@ package com.academy.eventhub.service;
 import com.academy.eventhub.dto.UserResponseDto;
 import com.academy.eventhub.dto.UserRoleUpdateDto;
 import com.academy.eventhub.dto.UserUpdateDto;
+import com.academy.eventhub.entity.User;
 
 import java.util.List;
 
@@ -14,5 +15,7 @@ public interface UserService
     void deleteUser(Long id);
 
     UserResponseDto updateUserRole(Long id, UserRoleUpdateDto roleDto);
+
+    UserResponseDto getUserByUsername(String username);
 
 }

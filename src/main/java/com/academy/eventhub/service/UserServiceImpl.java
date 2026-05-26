@@ -158,6 +158,15 @@ public class UserServiceImpl implements UserService
         return convertToResponseDto(foundUser);
     }
 
+    @Override
+    public UserResponseDto getUserByUsername(String username)
+    {
+        User foundUser = userRepository.findByUsername(username)
+                .orElseThrow( () -> new ResourceNotFoundException("Utente non trovato con username: " + username) );
+
+        return convertToResponseDto(foundUser);
+    }
+
     /*
         Metodo di utilità interno (Helper) incaricato di mappare un'entità JPA User
         in un oggetto di trasporto sicuro UserResponseDto.
