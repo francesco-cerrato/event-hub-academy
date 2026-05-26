@@ -27,6 +27,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/events")
+@CrossOrigin(origins = "http://localhost:8081")
 @Tag(name = "Events", description = "Endpoint per la consultazione pubblica, la pianificazione " +
         "e la prenotazione degli eventi.")
 

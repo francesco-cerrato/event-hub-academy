@@ -60,11 +60,24 @@ public class SecurityConfig
         // Disabilitazione CSRF (Cross-Site Request Forgery)
         http.csrf(csrf -> csrf.disable());
 
+         /*
+            [NUOVO] Abilita la gestione CORS nativa di Spring Security
+            per permettere a JavaScript di fare richieste cross-origin
+         */
+        http.cors(Customizer.withDefaults());
+
+
         /*
             Configurazione delle regole di autorizzazione per le chiamate HTTP
             le regole più specifiche vanno messe sempre prima di quelle più generiche
          */
         http.authorizeHttpRequests(auth -> auth
+                /*
+                   [NUOVO] Permesso pubblico per la Homepage e tutte le risorse statiche.
+                   Consente al browser di caricare liberamente HTML, CSS e JS senza bloccarsi.
+                 */
+                .requestMatchers("/", "/index.html", "/login.html", "/signup.html", "/css/**", "/js/**").permitAll()
+
                 // Permesso a chiunque, anche non loggato, di fare la registrazione
                 .requestMatchers("/auth/signup").permitAll()
                 // Permette l'accesso alla gestione degli errori di Spring per non nascondere i 404

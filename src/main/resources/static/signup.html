@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+
+<html>
+
+    <head>
+        <meta charset="UTF-8">
+        <title> EventHub - Signup </title>
+        <link rel="stylesheet" href="css/style.css">
+    </head>
+
+    <body>
+
+        <header>
+            <nav>
+                <a href="index.html"> <strong> EventHub </strong></a>
+                <div class="nav-links"> 
+                    <a href="login.html" id="navLogin"> Login </a>
+                    <a href="signup.html" id="navSignup"> Registrati </a>
+                    <a href="events.html" id="navEvents"> Eventi </a>
+                    <a href="my-bookings.html" id="navBookings"> Le mie prenotazioni </a>
+                    <a href="profile.html" id="navProfile"> Profilo </a>
+                    <a href="organizer-events.html" id="navOrganizer"> Gestione eventi </a>
+                    <a href="admin.html" id="navAdmin"> Pannello Admin </a>
+                    <a href="#" id="navLogout" onclick="logout()"> Logout </a>
+                </div>
+            </nav>
+        </header>            
+
+        <main>
+                <h1> Sign up </h1>
+                <form id="signupForm">
+                    <input type="text" name="" id="signupUsername" placeholder="Nome Utente">
+                    <br>
+                    <input type="password" name="" id="signupPassword" placeholder="Password">
+                    <br>
+                    <input type="text" name="" id="signupFirstname" placeholder="Il tuo nome">
+                    <br>
+                    <input type="text" name="" id="signupLastname" placeholder="Il tuo cognome">
+                    <br>
+                    <input type="text" name="" id="signupCity" placeholder="La tua città">
+                    <br>
+                    <button type="submit">Registrati</button>
+                </form>
+        </main>
+
+        <footer>
+            <p>&copy; 2026 EventHub — Progetto Finale Academy</p>
+        </footer>
+
+        <script src="js/auth.js"></script>
+
+
+    </body>
+
+</html>

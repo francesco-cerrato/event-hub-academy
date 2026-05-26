@@ -14,13 +14,11 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/auth") // rotta base per l'autenticazione
+@CrossOrigin(origins = "http://localhost:8081")
 @Tag(name = "Authentication", description = "Endpoint per la registrazione di nuovi utenti nel sistema")
 public class AuthController
 {

@@ -1,0 +1,72 @@
+
+*
+{
+    margin: 0; /* La proprietà "margin" è utilizzata per creare spazio esterno attorno agli elementi*/
+    padding: 0; /* La proprietà "padding" è utilizzata per creare spazio interno tra il contenuto del suo elemento e il suo bordo*/
+    box-sizing: border-box; 
+}
+
+
+body {
+    font-family: sans-serif; /* Font standard, pulito e leggibile */
+    line-height: 1.5;
+    background-color: #ffffff;
+    color: #000000;
+    
+    /* Mantiene il footer sul fondo della pagina */
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+header {
+    border-bottom: 2px solid #000000; /* Linea di netta separazione */
+    padding: 10px 20px;
+}
+
+nav {
+    display: flex;
+    justify-content: space-between; /* Brand a sinistra, link a destra */
+    align-items: center;
+}
+
+.nav-links {
+    display: flex;
+    gap: 15px; /* Spazio fisso e identico tra ogni link */
+}
+
+nav a {
+    color: #0000ee; /* Colore blu classico dei link web */
+    text-decoration: underline; /* Sottolineatura standard per far capire che sono cliccabili */
+}
+
+nav a:hover {
+    color: #551a8b; /* Cambia colore al passaggio del mouse (viola classico) */
+}
+
+main {
+    flex: 1; /* Occupa lo spazio centrale spingendo giù il footer */
+    max-width: 960px; /* Dimensione standard per non far allungare le righe di testo */
+    margin: 30px auto; /* Centra il blocco nello schermo */
+    padding: 0 20px;
+}
+
+main h1 {
+    margin-bottom: 15px;
+}
+
+footer {
+    border-top: 1px solid #cccccc;
+    text-align: center;
+    padding: 15px;
+    font-size: 0.9rem;
+    color: #555555;
+}
+
+.hidden {
+    display: none !important;
+}
+
+
+
+
