@@ -1,5 +1,6 @@
 package com.academy.eventhub.controller;
 
+import com.academy.eventhub.dto.TicketResponseDto;
 import com.academy.eventhub.service.TicketService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -7,12 +8,10 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/tickets")
@@ -26,6 +25,21 @@ public class TicketController
     public TicketController(TicketService ticketService)
     {
         this.ticketService = ticketService;
+    }
+
+    @Operation(
+            summary = "Visualizza i tuoi biglietti",
+            description = "Consente all'utente autenticato di visualizzare la lista di tutti i biglietti acquistati."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Lista dei biglietti recuperata con successo"),
+            @ApiResponse(responseCode = "401", description = "Utente non autenticato")
+    })
+    @GetMapping("/my-tickets")
+    public ResponseEntity<List<TicketResponseDto>> getMyTickets(Principal principal)
+    {
+        List<TicketResponseDto> myTickets = ticketService.getUserTickets(principal.getName());
+        return ResponseEntity.ok(myTickets);
     }
 
 

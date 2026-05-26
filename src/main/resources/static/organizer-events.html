@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+
+    <head>
+        <meta charset="UTF-8">
+        <title> EventHub - Area Organizer </title>
+        <link rel="stylesheet" href="css/style.css">
+    </head>
+
+    <body>
+
+        <header>
+            <nav>
+                <a href="index.html"> <strong> EventHub </strong></a>
+                <div class="nav-links"> 
+                    <a href="login.html" id="navLogin"> Login </a>
+                    <a href="signup.html" id="navSignup"> Registrati </a>
+                    <a href="events.html" id="navEvents"> Eventi </a>
+                    <a href="my-bookings.html" id="navBookings"> Le mie prenotazioni </a>
+                    <a href="profile.html" id="navProfile"> Profilo </a>
+                    <a href="organizer-events.html" id="navOrganizer"> Gestione eventi </a>
+                    <a href="admin.html" id="navAdmin"> Pannello Admin </a>
+                    <a href="#" id="navLogout" onclick="logout()"> Logout </a>
+                </div>
+            </nav>
+        </header>            
+
+        <main>
+            <h1> Area Gestione Organizzatore </h1>
+            <hr><br>
+
+            <!-- Sezione 1: Form di Creazione / Modifica Evento -->
+            <section id="eventFormSection" style="margin-bottom: 30px; padding: 20px; border: 1px solid #000;">
+                <h3 id="formTitle"> Crea un Nuovo Evento </h3>
+                <br>
+                <form id="organizerEventForm">
+                    <!-- ID nascosto, se è vuoto, al submit faremo una POST per creare l'evento. se contiene un ID, faremo una PUT per modificarlo-->
+                    <input type="hidden" id="eventId">
+
+                    <input type="text" id="eventTitle" placeholder="Titolo dell'evento" required><br><br>
+                    <textarea id="eventDescription" placeholder="Descrizione dell'evento" required></textarea><br><br>
+                    <input type="datetime-local" id="eventDate" required><br><br>
+                    <input type="number" id="eventPrice" placeholder="Prezzo Biglietto Standard" step="0.01" required><br><br>
+                    <input type="number" id="eventVipPrice" placeholder="Prezzo Biglietto VIP" step="0.01" required><br><br>
+                    
+                    <label for="eventVenue">Sede (Venue ID):</label>
+                    <input type="number" id="eventVenue" placeholder="ID della sede" required><br><br>
+
+                    <button type="submit" id="btnSubmitForm"> Pubblica Evento </button>
+                    <button type="button" id="btnCancelEdit" class="hidden" onclick="resetOrganizerForm()"> Annulla Modifica </button>
+                </form>
+            </section>
+
+            <!-- Sezione 2: Lista degli eventi creati dall'organizzatore -->
+            <section id="organizerEventsSection">
+                <h3> I Tuoi Eventi In Catalogo </h3>
+                <br>
+                <div id="organizerEventsContainer">
+                    <p> Caricamento dei tuoi eventi in corso... </p>
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <p>&copy; 2026 EventHub — Progetto Finale Academy</p>
+        </footer>
+
+        <script src="js/auth.js"></script>
+        <script src="js/organizer.js"></script>
+    </body>
+
+</html>

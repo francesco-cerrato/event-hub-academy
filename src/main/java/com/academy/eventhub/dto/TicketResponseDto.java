@@ -17,13 +17,14 @@ public class TicketResponseDto
     private BigDecimal pricePaid;
     private TicketStatus status;
     private LocalDateTime createdAt;
+    private LocalDateTime eventDate;
 
     public TicketResponseDto()
     {}
 
     public TicketResponseDto(Long id, Long event_id, String eventTitle, String username,
                              TicketType type, BigDecimal pricePaid,
-                             TicketStatus status, LocalDateTime createdAt) {
+                             TicketStatus status, LocalDateTime createdAt, LocalDateTime eventDate) {
         this.id = id;
         this.eventId = event_id;
         this.eventTitle = eventTitle;
@@ -32,6 +33,7 @@ public class TicketResponseDto
         this.pricePaid = pricePaid;
         this.status = status;
         this.createdAt = createdAt;
+        this.eventDate = eventDate;
     }
 
     public Long getId() {
@@ -96,5 +98,13 @@ public class TicketResponseDto
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getEventDate() {
+        return eventDate;
+    }
+
+    public void setEventDate(LocalDateTime eventDate) {
+        this.eventDate = eventDate;
     }
 }

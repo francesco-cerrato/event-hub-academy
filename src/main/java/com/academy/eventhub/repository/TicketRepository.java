@@ -4,6 +4,8 @@ import com.academy.eventhub.entity.Ticket;
 import com.academy.eventhub.entity.TicketStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
+
 /*
     Questo repository è iniettato all'interno di EventServiceImpl per countByEventIdAndStatus
 
@@ -22,4 +24,9 @@ public interface TicketRepository extends JpaRepository<Ticket, Long>
 
     // Verifica se esiste già un ticket ATTIVO associato a uno specifico utente e a uno specifico evento
     boolean existsByUserIdAndEventIdAndStatus(Long userId, Long eventId, TicketStatus status);
+
+    // Recupera i biglietti filtrando per l'username dell'utente
+    List<Ticket> findByUserUsername(String username);
+
+
 }

@@ -2,6 +2,7 @@ package com.academy.eventhub.service;
 
 import com.academy.eventhub.dto.TicketRequestDto;
 import com.academy.eventhub.dto.TicketResponseDto;
+import com.academy.eventhub.dto.VenueResponseDto;
 import com.academy.eventhub.entity.*;
 import com.academy.eventhub.exception.ResourceNotFoundException;
 import com.academy.eventhub.repository.EventRepository;
@@ -13,6 +14,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class TicketServiceImpl implements TicketService
@@ -128,6 +131,23 @@ public class TicketServiceImpl implements TicketService
          */
     }
 
+    @Override
+    public List<TicketResponseDto> getUserTickets(String currentUsername)
+    {
+        List<Ticket> ticketList = ticketRepository.findByUserUsername(currentUsername);
+
+        List<TicketResponseDto> dtoList = new ArrayList<>();
+
+        for (Ticket ticket : ticketList)
+        {
+            TicketResponseDto dto = convertToResponseDto(ticket);
+
+            dtoList.add(dto);
+        }
+
+        return dtoList;
+    }
+
     private TicketResponseDto convertToResponseDto(Ticket ticket)
     {
         TicketResponseDto ticketResponseDto = new TicketResponseDto();
@@ -140,6 +160,8 @@ public class TicketServiceImpl implements TicketService
         ticketResponseDto.setPricePaid(ticket.getPricePaid());
         ticketResponseDto.setStatus(ticket.getStatus());
         ticketResponseDto.setCreatedAt(ticket.getCreatedAt());
+        ticketResponseDto.setEventDate(ticket.getEvent().getEventDate());
+
 
         return ticketResponseDto;
     }
