@@ -1,0 +1,1132 @@
+{
+  "info": {
+    "_postman_id": "20c803a3-b44c-4ce6-af02-e0a00d89ef21",
+    "name": "EventHub",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "54539515",
+    "_collection_link": "https://go.postman.co/collection/54539515-20c803a3-b44c-4ce6-af02-e0a00d89ef21?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "01. Authentication",
+      "item": [
+        {
+          "name": "Registrazione nuovo utente",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"username\": \"Francesco_Cerrato\",\r\n  \"password\": \"Pass_123\",\r\n  \"firstName\": \"Francesco\",\r\n  \"lastName\": \"Cerrato\",\r\n  \"city\": \"Salerno\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/signup",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "signup"
+              ]
+            },
+            "description": "Registrazione nuovo utente"
+          },
+          "response": []
+        }
+      ],
+      "auth": {
+        "type": "noauth"
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {},
+            "exec": [
+              ""
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {},
+            "exec": [
+              ""
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "02. User & Profile Flow",
+      "item": [
+        {
+          "name": "Visualizza il proprio profilo esteso",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/profiles/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "profiles",
+                "me"
+              ]
+            },
+            "description": "Visualizza il proprio profilo esteso"
+          },
+          "response": []
+        },
+        {
+          "name": "Aggiorna il proprio profilo esteso",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"firstName\": \"Mario\",\r\n  \"lastName\": \"Rossi\",\r\n  \"bio\": \"Sviluppatore software appassionato di Spring Boot.\",\r\n  \"city\": \"Roma\",\r\n  \"avatarUrl\": \"https://example.com\"\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/profiles/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "profiles",
+                "me"
+              ]
+            },
+            "description": "Aggiorna il proprio profilo esteso"
+          },
+          "response": []
+        },
+        {
+          "name": "Recupera l'account dell'utente autenticato",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/users/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "users",
+                "me"
+              ]
+            },
+            "description": "Recupera l'account dell'utente autenticato"
+          },
+          "response": []
+        },
+        {
+          "name": "Recupera informazioni di un utente",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/users/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "users",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "Recupera informazioni di un utente"
+          },
+          "response": []
+        },
+        {
+          "name": "Aggiorna informazioni account",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"username\": \"mario_rossi\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/users/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "users",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "Aggiorna informazioni account"
+          },
+          "response": []
+        },
+        {
+          "name": "Elimina account",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/users/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "users",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "Elimina account"
+          },
+          "response": []
+        }
+      ],
+      "auth": {
+        "type": "basic",
+        "basic": [
+          {
+            "key": "password",
+            "value": "{{user_password}}",
+            "type": "string"
+          },
+          {
+            "key": "username",
+            "value": "{{user_username}}",
+            "type": "string"
+          }
+        ]
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {},
+            "exec": [
+              ""
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {},
+            "exec": [
+              ""
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "03. Events, Tickets & Feedbacks",
+      "item": [
+        {
+          "name": "Elenca eventi con filtri e paginazione",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/events",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "events"
+              ]
+            },
+            "description": "Elenca eventi con filtri e paginazione"
+          },
+          "response": []
+        },
+        {
+          "name": "Dettaglio singolo evento",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/events/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "events",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "Dettaglio singolo evento"
+          },
+          "response": []
+        },
+        {
+          "name": "Prenota un biglietto standard/VIP",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"type\": \"STANDARD\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/events/:id/book",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "events",
+                ":id",
+                "book"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "Prenota un biglietto standard/VIP"
+          },
+          "response": []
+        },
+        {
+          "name": "Visualizza i propri biglietti acquistati",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/tickets/my-tickets",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "tickets",
+                "my-tickets"
+              ]
+            },
+            "description": "Visualizza i propri biglietti acquistati"
+          },
+          "response": []
+        },
+        {
+          "name": "Cancella una prenotazione prima dell'evento",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/tickets/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "tickets",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "Cancella una prenotazione prima dell'evento"
+          },
+          "response": []
+        },
+        {
+          "name": "Lascia una recensione post-evento",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"rating\": 5,\r\n  \"comment\": \"Evento fantastico! Organizzazione impeccabile.\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/feedbacks/events/:eventId",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "feedbacks",
+                "events",
+                ":eventId"
+              ],
+              "variable": [
+                {
+                  "key": "eventId",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "Lascia una recensione post-evento"
+          },
+          "response": []
+        },
+        {
+          "name": "Vedi feedbacks di un evento",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/feedbacks/events/:eventId",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "feedbacks",
+                "events",
+                ":eventId"
+              ],
+              "variable": [
+                {
+                  "key": "eventId",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "Vedi feedbacks di un evento"
+          },
+          "response": []
+        },
+        {
+          "name": "Vedi media voto dell'evento",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/feedbacks/events/:eventId/rating",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "feedbacks",
+                "events",
+                ":eventId",
+                "rating"
+              ],
+              "variable": [
+                {
+                  "key": "eventId",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "Vedi media voto dell'evento"
+          },
+          "response": []
+        },
+        {
+          "name": "Ottieni singolo feedback",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/feedbacks/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "feedbacks",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "Ottieni singolo feedback"
+          },
+          "response": []
+        },
+        {
+          "name": "Modifica un feedback",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"rating\": 2,\r\n  \"comment\": \"Evento pessimo!\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/feedbacks/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "feedbacks",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "Modifica un feedback"
+          },
+          "response": []
+        },
+        {
+          "name": "Rimuovi un feedback",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/feedbacks/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "feedbacks",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "Rimuovi un feedback"
+          },
+          "response": []
+        },
+        {
+          "name": "Lista globale dei feedbacks",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/feedbacks",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "feedbacks"
+              ]
+            },
+            "description": "Lista globale dei feedbacks"
+          },
+          "response": []
+        }
+      ],
+      "auth": {
+        "type": "basic",
+        "basic": [
+          {
+            "key": "password",
+            "value": "{{user_password}}",
+            "type": "string"
+          },
+          {
+            "key": "username",
+            "value": "{{user_username}}",
+            "type": "string"
+          }
+        ]
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {},
+            "exec": [
+              ""
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {},
+            "exec": [
+              ""
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "04. Organizer Flow",
+      "item": [
+        {
+          "name": "Pianifica e pubblica un nuovo evento",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"title\": \"Spring Boot Capstone Summit 2026\",\r\n  \"description\": \"L'evento finale dell'academy dedicato ai migliori progetti in Spring Boot.\",\r\n  \"eventDate\": \"2026-10-15T10:00:00\",\r\n  \"price\": 19.99,\r\n  \"vipPrice\": 49.99,\r\n  \"venueId\": 1,\r\n  \"tagIds\": [],\r\n  \"speakerIds\": []\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/events",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "events"
+              ]
+            },
+            "description": "Pianifica e pubblica un nuovo evento"
+          },
+          "response": []
+        },
+        {
+          "name": "Modifica un proprio evento esistente",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"title\": \"Workshop Avanzato Microservizi Cloud\",\r\n  \"description\": \"Sessione pratica intensiva sull'architettura a microservizi\",\r\n  \"eventDate\": \"2026-12-05T14:30:00\",\r\n  \"price\": 25.00,\r\n  \"vipPrice\": 75.50,\r\n  \"venueId\": 3,\r\n  \"tagIds\": [],\r\n  \"speakerIds\": []\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/events/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "events",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "Modifica un proprio evento esistente"
+          },
+          "response": []
+        },
+        {
+          "name": "Annulla e cancella un proprio evento",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/events/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "events",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "Annulla e cancella un proprio evento"
+          },
+          "response": []
+        }
+      ],
+      "auth": {
+        "type": "basic",
+        "basic": [
+          {
+            "key": "password",
+            "value": "{{organizer_password}}",
+            "type": "string"
+          },
+          {
+            "key": "username",
+            "value": "{{organizer_username}}",
+            "type": "string"
+          }
+        ]
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {},
+            "exec": [
+              ""
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {},
+            "exec": [
+              ""
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "05. Admin Flow",
+      "item": [
+        {
+          "name": "Venues",
+          "item": [
+            {
+              "name": "Ottieni elenco totale delle sedi",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/admin/venues",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "admin",
+                    "venues"
+                  ]
+                },
+                "description": "Ottieni elenco totale delle sedi"
+              },
+              "response": []
+            },
+            {
+              "name": "Ottieni singola sede",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/admin/venues/:id",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "admin",
+                    "venues",
+                    ":id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "1"
+                    }
+                  ]
+                },
+                "description": "Ottieni singola sede"
+              },
+              "response": []
+            },
+            {
+              "name": "Crea nuova sede",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"name\": \"Auditorium del Futuro\",\r\n  \"address\": \"Via dell'Academy 42, Roma\",\r\n  \"capacity\": 250\r\n}\r\n",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/admin/venues",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "admin",
+                    "venues"
+                  ]
+                },
+                "description": "Crea nuova sede"
+              },
+              "response": []
+            },
+            {
+              "name": "Aggiorna sede",
+              "request": {
+                "method": "PUT",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"name\": \"Teatro Centrale Academy\",\r\n  \"address\": \"Piazza della Repubblica 10, Milano\",\r\n  \"capacity\": 500\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/admin/venues/:id",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "admin",
+                    "venues",
+                    ":id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "1"
+                    }
+                  ]
+                },
+                "description": "Aggiorna sede"
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Speakers",
+          "item": [
+            {
+              "name": "Ottieni elenco totale dei relatori",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/admin/speakers",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "admin",
+                    "speakers"
+                  ]
+                },
+                "description": "Ottieni elenco totale dei relatori"
+              },
+              "response": []
+            },
+            {
+              "name": "Ottieni singolo relatore",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/admin/speakers/:id",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "admin",
+                    "speakers",
+                    ":id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "1"
+                    }
+                  ]
+                },
+                "description": "Ottieni singolo relatore"
+              },
+              "response": []
+            },
+            {
+              "name": "Crea un nuovo relatore",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"name\": \"Dott.ssa Valeria Verdi\",\r\n  \"bio\": \"Senior Java Developer con oltre 10 anni di esperienza.\"\r\n}\r\n",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/admin/speakers",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "admin",
+                    "speakers"
+                  ]
+                },
+                "description": "Crea un nuovo relatore"
+              },
+              "response": []
+            },
+            {
+              "name": "Aggiorna relatore",
+              "request": {
+                "method": "PUT",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"name\": \"Prof. Alessandro Bianchi\",\r\n  \"bio\": \"Ricercatore universitario ed esperto di Intelligenza Artificiale.\"\r\n}\r\n",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/admin/speakers/:id",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "admin",
+                    "speakers",
+                    ":id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "1"
+                    }
+                  ]
+                },
+                "description": "Aggiorna relatore"
+              },
+              "response": []
+            },
+            {
+              "name": "Elimina relatore",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/admin/speakers/:id",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "admin",
+                    "speakers",
+                    ":id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "1"
+                    }
+                  ]
+                },
+                "description": "Elimina relatore"
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Aggiorna il ruolo di un utente, es. promozione a ORGANIZER",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"role\": \"ROLE_ORGANIZER\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/users/:id/role",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "users",
+                ":id",
+                "role"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "Aggiorna il ruolo di un utente, es. promozione a ORGANIZER"
+          },
+          "response": []
+        },
+        {
+          "name": "Ottiene l'elenco di tutti gli utenti nel sistema",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/users",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "users"
+              ]
+            },
+            "description": "Ottiene l'elenco di tutti gli utenti nel sistema"
+          },
+          "response": []
+        }
+      ],
+      "auth": {
+        "type": "basic",
+        "basic": [
+          {
+            "key": "password",
+            "value": "{{admin_password}}",
+            "type": "string"
+          },
+          {
+            "key": "username",
+            "value": "{{admin_username}}",
+            "type": "string"
+          }
+        ]
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {},
+            "exec": [
+              ""
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {},
+            "exec": [
+              ""
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
