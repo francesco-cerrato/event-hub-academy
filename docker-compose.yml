@@ -5,7 +5,7 @@ version: '3.8'
 services:
   # Database PostgreSQL per la memorizzazione dei dati di EventHub
   postgres-db:
-  # Indica a Docker quale pacchetto ufficiale scaricare da internet
+    # Indica a Docker quale pacchetto ufficiale scaricare da internet
     image: postgres:15-alpine
     container_name: eventhub-postgres
     ports:
@@ -16,16 +16,40 @@ services:
       POSTGRES_PASSWORD: password123 # Password di accesso
     volumes:
       - postgres_data:/var/lib/postgresql/data # Persistenza dei dati sul disco locale
+    # Verifica lo stato di salute del DB prima di far partire altre app collegate
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U eventhub_admin -d eventhub"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   # Interfaccia web grafica per l'amministrazione visiva del database
   adminer:
-  # Scarica l'ultima versione disponibile ('latest') del software Adminer da Docker Hub.
+    # Scarica l'ultima versione disponibile ('latest') del software Adminer da Docker Hub.
     image: adminer:latest
     container_name: eventhub-adminer
     ports:
       - "8080:8080" # Raggiungibile via browser su http://localhost:8080
     depends_on:
       - postgres-db # Attende l'avvio del database prima di partire
+
+  # Applicazione Spring Boot (EventHub Backend)
+  spring-app:
+    # Indica a Docker di cercare il file 'Dockerfile' nella cartella corrente per compilare l'app
+    build: .
+    container_name: eventhub-backend
+    ports:
+      - "8081:8081" # Raggiungibile via browser o Postman sulla porta 8081 locale
+    environment:
+      # Configura le variabili d'ambiente lette dal file application.properties
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-db:5432/eventhub
+      SPRING_DATASOURCE_USERNAME: eventhub_admin
+      SPRING_DATASOURCE_PASSWORD: password123
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+    depends_on:
+      postgres-db:
+        # Avvia Spring Boot solo quando il database è totalmente pronto e superato l'healthcheck
+        condition: service_healthy
 
 volumes:
   postgres_data: # Dichiarazione del volume per non perdere i dati allo spegnimento
