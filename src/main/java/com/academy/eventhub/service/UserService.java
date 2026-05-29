@@ -18,7 +18,6 @@ public interface UserService
 
     UserResponseDto getUserByUsername(String username);
 
-    public void banUser(Long id);
 
 
 }

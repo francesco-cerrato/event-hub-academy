@@ -3,14 +3,15 @@ const PUBLIC_USERS_API = 'http://localhost:8081/api/users';
 const ADMIN_VENUES_API = 'http://localhost:8081/admin/venues';
 
 /*
-    Scarica tutti gli utenti del sistema e li elenca a schermo
+    Scarica tutti gli utenti del sistema e li elenca a schermo (Riservato ad ADMIN)
 */
 async function fetchAllUsers() {
     const container = document.getElementById('adminUsersContainer');
     const authHeader = sessionStorage.getItem('authHeader');
 
     try {
-        const response = await fetch(PUBLIC_USERS_API, {
+        // Ora punta a /admin/users per caricare l'elenco protetto
+        const response = await fetch(ADMIN_USERS_API, {
             method: 'GET',
             headers: {
                 'Authorization': authHeader,
@@ -25,7 +26,7 @@ async function fetchAllUsers() {
 
     } catch (error) {
         console.error('Errore caricamento utenti:', error);
-        container.innerHTML = '<p style="color: red;">Impossibile caricare l\'elenco degli utenti.</p>';
+        container.innerHTML = '<p style="color: red;">Impossibile caricare l\'elenco degli utenti. Verifica i privilegi amministrativi.</p>';
     }
 }
 
@@ -47,6 +48,7 @@ function renderUsersTable(users) {
         row.style.padding = '10px';
         row.style.marginBottom = '10px';
 
+        // Gestione pulita sia in caso di array/set che di singola stringa per i ruoli
         const rolesString = user.roles ? Array.from(user.roles).join(', ') : 'Nessun ruolo';
 
         row.innerHTML = `
@@ -54,7 +56,7 @@ function renderUsersTable(users) {
             <p><strong>Ruoli Attuali:</strong> <em>${rolesString}</em></p>
             <br>
             <button onclick="promoteToOrganizer(${user.id})" style="padding: 2px 10px; cursor: pointer;">Promuovi a Organizer</button>
-            <button onclick="banUser(${user.id})" style="padding: 2px 10px; cursor: pointer; color: red; margin-left: 10px;">Banna/Elimina</button>
+            <button onclick="banUser(${user.id})" style="padding: 2px 10px; cursor: pointer; color: red; margin-left: 10px;">Elimina Utente</button>
         `;
         container.appendChild(row);
     });
@@ -66,7 +68,6 @@ function renderUsersTable(users) {
 async function promoteToOrganizer(userId) {
     const authHeader = sessionStorage.getItem('authHeader');
     
-    // Configurato millimetricamente sul UserRoleUpdateDto ("role": "ROLE_ORGANIZER")
     const payload = {
         role: "ROLE_ORGANIZER" 
     };
@@ -97,7 +98,7 @@ async function promoteToOrganizer(userId) {
 }
 
 /*
-    Elimina (Banna) un utente dal sistema
+    Elimina fisicamente un utente dal sistema (Riservato ad ADMIN)
 */
 async function banUser(userId) {
     const authHeader = sessionStorage.getItem('authHeader');
@@ -105,7 +106,8 @@ async function banUser(userId) {
     if (!confirm("⚠️ Sei sicuro di voler eliminare permanentemente questo utente dal sistema?")) return;
 
     try {
-        const response = await fetch(`${PUBLIC_USERS_API}/${userId}`, {
+        // Ora effettua la DELETE su /admin/users/{id}
+        const response = await fetch(`${ADMIN_USERS_API}/${userId}`, {
             method: 'DELETE',
             headers: {
                 'Authorization': authHeader
@@ -113,10 +115,11 @@ async function banUser(userId) {
         });
 
         if (response.status === 204) {
-            alert('Utente eliminato con successo dal sistema!');
+            alert('Utente eliminato fisicamente con successo dal sistema!');
             fetchAllUsers(); // Ricarica l'elenco utenti aggiornato
         } else {
-            alert('Impossibile eliminare l\'utente. Verifica i permessi.');
+            const err = await response.json().catch(() => ({}));
+            alert(`Errore: ${err.message || 'Impossibile eliminare l\'utente. Verifica i permessi.'}`);
         }
     } catch (error) {
         console.error(error);
@@ -181,7 +184,6 @@ async function handleVenueSubmit(event) {
     event.preventDefault();
     const authHeader = sessionStorage.getItem('authHeader');
 
-    // Mappatura esatta sul tuo VenueRequestDto
     const venuePayload = {
         name: document.getElementById('venueName').value,
         address: document.getElementById('venueAddress').value,
@@ -201,7 +203,7 @@ async function handleVenueSubmit(event) {
         if (response.status === 201) {
             alert('Sede creata con successo!');
             document.getElementById('adminVenueForm').reset();
-            fetchAllVenues(); // Ricarica la lista per includere la nuova riga
+            fetchAllVenues(); // Ricarica la lista
         } else {
             const err = await response.json().catch(() => ({}));
             alert(`Errore creazione sede: ${err.message || 'Controlla i dati immessi.'}`);

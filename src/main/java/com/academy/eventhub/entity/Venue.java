@@ -34,7 +34,7 @@ public class Venue
         cascade = CascadeType.ALL: Qualsiasi operazione (salvataggio, aggiornamento, cancellazione) effettuata su questa entità si riflette automaticamente su tutti gli eventi associati.
         fetch = FetchType.LAZY: Gli eventi associati vengono caricati dal database solo quando si accede esplicitamente alla lista (es. tramite getEvents()), ottimizzando le prestazioni.
      */
-    @OneToMany(mappedBy = "venue", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "venue", fetch = FetchType.LAZY)
     private List<Event> events = new ArrayList<>();
 
     public Venue()

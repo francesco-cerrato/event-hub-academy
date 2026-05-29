@@ -12,7 +12,7 @@ La piattaforma si basa su tre ruoli con permessi crescenti, governati da precise
 
 *   **USER (Utente Registrato):** Può gestire e aggiornare i propri dettagli personali (nome, cognome, biografia, città, URL avatar), sfogliare il catalogo degli eventi pubblici (con filtri per data e tag), prenotare un biglietto (Standard o VIP), consultare le proprie prenotazioni (e cancellarle prima dell'inizio) e lasciare un feedback.
 *   **ORGANIZER (Organizzatore):** Eredita le funzioni di USER. Può creare nuovi eventi associandoli alle sedi e ai relatori in catalogo, modificare o cancellare i propri eventi, monitorare la lista dei partecipanti e vedere la media dei feedback ricevuti.
-*   **ADMIN (Amministratore):** Ha il controllo totale della piattaforma. Gestisce gli utenti (promozione a ORGANIZER, revoca o ban), modera e cancella i feedback inappropriati e controlla i cataloghi condivisi delle sedi (Venues), dei relatori (Speakers) e delle categorie (Tags). Inoltre, può modificare o eliminare qualsiasi evento.
+*   **ADMIN (Amministratore):** Ha il controllo totale della piattaforma. Gestisce gli utenti (promozione a ORGANIZER, revoca o eliminazione fisica), modera e cancella i feedback inappropriati e controlla i cataloghi condivisi delle sedi (Venues), dei relatori (Speakers) e delle categorie (Tags). Inoltre, può modificare o eliminare qualsiasi evento.
 
 ---
 
@@ -28,7 +28,7 @@ Ogni regola è stata rigorosamente rispettata e implementata nella logica transa
 6. **Un solo feedback per evento:** Lo stesso utente non può lasciare più feedback sullo stesso evento.
 7. **Solo il creatore o l'admin** può modificare/cancellare un evento.
 8. **Prezzi:** Il biglietto VIP deve costare più dello standard; entrambi i prezzi sono configurabili e validati per ciascun evento.
-9. **Utente bannato:** Non può fare login né prenotare. I suoi biglietti futuri sono automaticamente cancellati al momento del ban impostato dall'amministratore.
+9. **Eliminazione Utente:** L'amministratore può rimuovere permanentemente un account. La cancellazione elimina l'anagrafica e disattiva/rimuove i relativi biglietti, impedendo futuri accessi tramite Basic Auth.
 
 ---
 
@@ -91,7 +91,7 @@ All'avvio della piattaforma, puoi utilizzare i seguenti utenti preconfigurati ne
 
 | Ruolo | Username | Password | Funzionalità Principale da Testare |
 | :--- | :--- | :--- | :--- |
-| **ADMIN** | `Rocco_Aliberti` | `PasswordSicura789` | Gestione cataloghi sedi/relatori, ban e promozione utenti su `/admin.html`. |
+| **ADMIN** | `Rocco_Aliberti` | `PasswordSicura789` | Gestione cataloghi sedi/relatori, eliminazione e promozione utenti su `/admin.html`. |
 | **ORGANIZER** | `Vittorio_Leo` | `PasswordSicura012` | Creazione eventi, controllo vincolo prezzi e monitoraggio partecipanti su `/organizer-events.html`. |
 | **USER** | `Tommaso_Ascoli` | `PasswordSicura543` | Ricerca eventi, acquisto ticket, gestione profilo su `/profile.html` e feedback su `/my-bookings.html`. |
 

@@ -38,8 +38,7 @@ public class AuthServiceImpl implements AuthService
         // Controllo di sicurezza per impedire la registrazione di account duplicati
         if (userRepository.existsByUsername(registerRequest.getUsername()))
         {
-            throw new ResourceNotFoundException("Username already exists");
-            // Da sostituire con un'eccezione custom nello Step 3
+            throw new IllegalStateException("Username already exists");
         }
 
 
@@ -51,8 +50,6 @@ public class AuthServiceImpl implements AuthService
         newUser.setEnabled(true); // Account attivo di default per Spring Security
         newUser.setBanned(false); // Stato iniziale di sblocco
 
-        // Salvataggio utente con rispettivo id automatico nel DB
-        userRepository.save(newUser);
 
         Profile newProfile = new Profile();
         newProfile.setFirstName(registerRequest.getFirstName());
@@ -64,8 +61,8 @@ public class AuthServiceImpl implements AuthService
         newProfile.setUser(newUser);   // Lato proprietario (scrive la FK user_id)
         newUser.setProfile(newProfile); // Lato inverso (gestito grazie a CascadeType.ALL)
 
-        // SALVIAMO IL PROFILO ESPLICITAMENTE
-        profileRepository.save(newProfile);
+        // Salvataggio utente con rispettivo id automatico nel DB
+        userRepository.save(newUser);
 
 
         // Creazione e assegnazione del ruolo predifinito per il primo accesso
@@ -74,7 +71,6 @@ public class AuthServiceImpl implements AuthService
         defaulRole.setAuthority("ROLE_USER"); // Prefisso standard obbligatorio per il framework
         roleRepository.save(defaulRole);
 
-        // Creazione e assegnazione del profilo per l'utente
 
         return newUser;
 

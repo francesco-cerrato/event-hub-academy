@@ -137,6 +137,9 @@ class EventServiceTest {
         existingEvent.setId(eventId);
         existingEvent.setOrganizer(organizer);
 
+        existingEvent.setTags(new java.util.HashSet<>());
+        existingEvent.setSpeakers(new java.util.HashSet<>());
+
         EventRequestDto requestDto = new EventRequestDto();
 
         // MOCK DI SPRING SECURITY: Diciamo al test che l'utente attuale è un semplice ROLE_USER (non ADMIN)
@@ -269,6 +272,8 @@ class EventServiceTest {
         requestDto.setVenueId(2L);
         requestDto.setPrice(BigDecimal.valueOf(15.0));
         requestDto.setVipPrice(BigDecimal.valueOf(40.0)); // Valido (VIP > Standard)
+
+
 
         // MOCK DI SPRING SECURITY: Configuriamo l'utente nel contesto come ROLE_ADMIN
         org.springframework.security.core.Authentication authentication = Mockito.mock(org.springframework.security.core.Authentication.class);

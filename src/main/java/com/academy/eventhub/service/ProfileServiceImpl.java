@@ -9,6 +9,7 @@ import com.academy.eventhub.repository.ProfileRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,6 +47,7 @@ public class ProfileServiceImpl implements ProfileService{
     }
 
     @Override
+    @Transactional
     public ProfileResponseDto updateProfile(Long id, ProfileUpdateDto inputDto)
     {
         Profile profileToUpdate = profileRepository.findById(id)
@@ -72,6 +74,7 @@ public class ProfileServiceImpl implements ProfileService{
     }
 
     @Override
+    @Transactional
     public ProfileResponseDto updateProfileByUsername(String username, ProfileUpdateDto inputDto)
     {
         Profile profileToUpdate = profileRepository.findByUserUsername(username)

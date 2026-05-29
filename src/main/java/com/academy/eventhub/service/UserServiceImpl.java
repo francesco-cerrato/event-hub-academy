@@ -1,5 +1,6 @@
 package com.academy.eventhub.service;
 
+import com.academy.eventhub.dto.ProfileResponseDto;
 import com.academy.eventhub.dto.UserResponseDto;
 import com.academy.eventhub.dto.UserRoleUpdateDto;
 import com.academy.eventhub.dto.UserUpdateDto;
@@ -86,6 +87,7 @@ public class UserServiceImpl implements UserService
         authorities (roles) per il rispettivo user
      */
     @Override
+    @Transactional
     public UserResponseDto updateUser(Long id, UserUpdateDto inputDto)
     {
         // Recupero utente dal DB tramite il suo id
@@ -120,6 +122,7 @@ public class UserServiceImpl implements UserService
         Rimuove in modo permanente un utente dal sistema identificandolo tramite l'id.
      */
     @Override
+    @Transactional
     public void deleteUser(Long id)
     {
         User foundUser = userRepository.findById(id)
@@ -131,6 +134,18 @@ public class UserServiceImpl implements UserService
         // Eliminazione record corrispondenti dalla tabella authorities
         for (Role role : rolesToDelete) {
             roleRepository.delete(role);
+        }
+
+        // Annullamento automatico di tutti i biglietti attivi per eventi futuri
+        // Recuperiamo tutti i ticket attivi dell'utente
+        List<Ticket> activeTickets = ticketRepository.findByUserUsername(foundUser.getUsername());
+
+        for (Ticket ticket : activeTickets) {
+            // Se lo stato è ACTIVE e l'evento associato deve ancora iniziare (è nel futuro)
+            if (ticket.getStatus() == TicketStatus.ACTIVE && ticket.getEvent().getEventDate().isAfter(LocalDateTime.now())) {
+                ticket.setStatus(TicketStatus.CANCELLED);
+                // Grazie a @Transactional, le modifiche allo stato del ticket verranno salvate automaticamente
+            }
         }
 
         userRepository.delete(foundUser);
@@ -166,6 +181,7 @@ public class UserServiceImpl implements UserService
     }
 
     @Override
+    @Transactional
     public UserResponseDto getUserByUsername(String username)
     {
         User foundUser = userRepository.findByUsername(username)
@@ -174,36 +190,6 @@ public class UserServiceImpl implements UserService
         return convertToResponseDto(foundUser);
     }
 
-    @Override
-    @Transactional
-    public void banUser(Long id) {
-        // Recupero dell'utente da bannare
-        User foundUser = userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Utente non trovato con id: " + id));
-
-        // Revoca di tutti i ruoli attuali e assegnazione del solo ruolo di blocco
-        List<Role> currentRoles = roleRepository.findByUsername(foundUser.getUsername());
-        for (Role role : currentRoles) {
-            roleRepository.delete(role);
-        }
-
-        Role bannedRole = new Role();
-        bannedRole.setUsername(foundUser.getUsername());
-        bannedRole.setAuthority("ROLE_BANNED");
-        roleRepository.save(bannedRole);
-
-        // Annullamento automatico di tutti i biglietti attivi per eventi futuri
-        // Recuperiamo tutti i ticket attivi dell'utente
-        List<Ticket> activeTickets = ticketRepository.findByUserUsername(foundUser.getUsername());
-
-        for (Ticket ticket : activeTickets) {
-            // Se lo stato è ACTIVE e l'evento associato deve ancora iniziare (è nel futuro)
-            if (ticket.getStatus() == TicketStatus.ACTIVE && ticket.getEvent().getEventDate().isAfter(LocalDateTime.now())) {
-                ticket.setStatus(TicketStatus.CANCELLED);
-                // Grazie a @Transactional, le modifiche allo stato del ticket verranno salvate automaticamente
-            }
-        }
-    }
 
 
 
@@ -225,6 +211,19 @@ public class UserServiceImpl implements UserService
         // Istanzia il DTO iniettando ID, Username (MANTENENDO LA PASSWORD SEGRETA) e i Ruoli raccolti
         UserResponseDto userResponseDto = new UserResponseDto(user.getId(),
                 user.getUsername(), rolesSet);
+
+        // Se l'utente ha un profilo associato, converte l'entità Profile nel relativo DTO
+        if (user.getProfile() != null) {
+            ProfileResponseDto profileDto = new ProfileResponseDto();
+            profileDto.setId(user.getProfile().getId());
+            profileDto.setFirstName(user.getProfile().getFirstName());
+            profileDto.setLastName(user.getProfile().getLastName());
+            profileDto.setUserId(user.getProfile().getUser().getId());
+            profileDto.setBio(user.getProfile().getBio());
+            profileDto.setCity(user.getProfile().getCity());
+            profileDto.setAvatarUrl(user.getProfile().getAvatarUrl());
+            userResponseDto.setProfile(profileDto);
+        }
 
         // Restituisce il DTO pronto all'uso
         return userResponseDto;

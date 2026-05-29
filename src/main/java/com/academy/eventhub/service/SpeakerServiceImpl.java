@@ -2,6 +2,7 @@ package com.academy.eventhub.service;
 
 import com.academy.eventhub.dto.SpeakerRequestDto;
 import com.academy.eventhub.dto.SpeakerResponseDto;
+import com.academy.eventhub.entity.Event;
 import com.academy.eventhub.entity.Speaker;
 import com.academy.eventhub.exception.ResourceNotFoundException;
 import com.academy.eventhub.repository.SpeakerRepository;
@@ -82,6 +83,11 @@ public class SpeakerServiceImpl implements SpeakerService
     {
         Speaker foundSpeaker = speakerRepository.findById(id)
                 .orElseThrow( () -> new ResourceNotFoundException("Speaker non trovato con id: " + id));
+
+        // Rimuove lo speaker da tutti gli eventi associati prima di eliminarlo fisicamente
+        for (Event event : foundSpeaker.getEvents()) {
+            event.getSpeakers().remove(foundSpeaker);
+        }
 
         speakerRepository.delete(foundSpeaker);
     }

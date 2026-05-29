@@ -239,7 +239,7 @@ public class EventServiceImpl implements EventService{
 
 
         /*
-        n   on serve nessun DTO per questo metodo.
+        non serve nessun DTO per questo metodo.
         Restituire un tipo primitivo int a livello di Service
         è la scelta più pulita e corretta, perché si tratta
         di un calcolo aritmetico interno alla logica di business.

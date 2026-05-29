@@ -83,8 +83,6 @@ public class SecurityConfig
                 // Permette l'accesso alla gestione degli errori di Spring per non nascondere i 404
                 .requestMatchers("/error").permitAll()
 
-                // Tutti possono leggere gli eventi (GET è pubblico)
-                .requestMatchers(HttpMethod.GET,"/api/events/**").permitAll()
 
                 /*
                     REGOLA AGGIUNTA PER LO STEP 7: Consente la prenotazione sia a USER che a ORGANIZER
@@ -92,11 +90,14 @@ public class SecurityConfig
                  */
                 .requestMatchers(HttpMethod.POST, "/api/events/{id}/book").hasAnyRole("USER", "ORGANIZER", "ADMIN")
 
+                // Tutti possono leggere gli eventi (GET è pubblico)
+                .requestMatchers(HttpMethod.GET,"/api/events/**").permitAll()
 
-                // Regole specifiche per la gestione degli eventi (Solo per gli ORGANIZER)
+
+                // Regole specifiche per la gestione degli eventi (solo per ORGANIZER E ADMIN)
                 .requestMatchers(HttpMethod.POST, "/api/events").hasRole("ORGANIZER")
-                .requestMatchers(HttpMethod.PUT, "/api/events/**").hasRole("ORGANIZER")
-                .requestMatchers(HttpMethod.DELETE, "/api/events/**").hasRole("ORGANIZER")
+                .requestMatchers(HttpMethod.PUT, "/api/events/**").hasAnyRole("ORGANIZER", "ADMIN")
+                .requestMatchers(HttpMethod.DELETE, "/api/events/**").hasAnyRole("ORGANIZER", "ADMIN")
 
 
 

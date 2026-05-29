@@ -74,6 +74,9 @@ public class EventSpecifications
         return (root, query, criteriaBuilder) -> {
             if (tagName == null || tagName.trim().isEmpty()) return null;
 
+            // Forza il DISTINCT per evitare la duplicazione degli eventi nella paginazione
+            query.distinct(true);
+
             /*
                 Poiché la relazione tra Event e Tag è Many-to-Many, a livello SQL è necessaria una INNER JOIN.
                 Diciamo a JPA di fare un'operazione di JOIN partendo dall'entità corrente (root/Event)
