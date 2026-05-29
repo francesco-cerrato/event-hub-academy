@@ -60,7 +60,6 @@ class EventServiceTest {
     private EventServiceImpl eventService;
 
     // TEST 1: CREAZIONE EVENTO (HAPPY PATH)
-
     @Test // Dice a JUnit che questo metodo è un test da eseguire
     @DisplayName("Creazione evento con successo (Happy Path)") // È il titolo del test visibile nei report
     void createEvent_Success() {
@@ -80,6 +79,10 @@ class EventServiceTest {
         requestDto.setTitle("Spring Boot Test Workshop");
         requestDto.setVenueId(1L);
         requestDto.setEventDate(LocalDateTime.now().plusDays(5)); // Data tra 5 giorni
+
+        // FISSARE I PREZZI: valorizziamo i campi per superare la validazione del servizio!
+        requestDto.setPrice(BigDecimal.valueOf(10.0));
+        requestDto.setVipPrice(BigDecimal.valueOf(30.0));
 
         // Prepariamo l'oggetto Evento che simulerà di essere stato salvato nel DB
         Event savedEvent = new Event("Spring Boot Test Workshop", "Desc", requestDto.getEventDate(), BigDecimal.valueOf(10.0), BigDecimal.valueOf(30.0));
@@ -116,42 +119,45 @@ class EventServiceTest {
     }
 
 
-    // TEST 2: VINCOLO REGOLA 7
-
+    // TEST 2 (AGGIORNATO)
+    // Inserito il mock di Spring Security per evitare NullPointerException
     @Test
-    @DisplayName("Aggiornamento fallisce se l'utente non è il creatore dell'evento (Regola 7)")
+    @DisplayName("Aggiornamento fallisce se l'utente non è il creatore dell'evento e non è ADMIN (Regola 7)")
     void updateEvent_ThrowsAccessDenied_WhenUserIsNotOrganizer() {
 
         // 1. ARRANGE
         Long eventId = 1L;
         String realOrganizer = "organizer_vero";
-        String maliciousUser = "utente_malizioso"; // L'utente che proverà a fare l'attacco
+        String maliciousUser = "utente_malizioso";
 
         User organizer = new User();
         organizer.setUsername(realOrganizer);
 
-        // Creiamo l'evento attualmente presente nel database, che appartiene a "organizer_vero"
         Event existingEvent = new Event();
         existingEvent.setId(eventId);
         existingEvent.setOrganizer(organizer);
 
         EventRequestDto requestDto = new EventRequestDto();
 
-        // Configuriamo il mock: "Quando il service cercherà l'evento da modificare, faglielo trovare"
+        // MOCK DI SPRING SECURITY: Diciamo al test che l'utente attuale è un semplice ROLE_USER (non ADMIN)
+        org.springframework.security.core.Authentication authentication = Mockito.mock(org.springframework.security.core.Authentication.class);
+        org.springframework.security.core.context.SecurityContext securityContext = Mockito.mock(org.springframework.security.core.context.SecurityContext.class);
+        Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
+        org.springframework.security.core.context.SecurityContextHolder.setContext(securityContext);
+
+        java.util.List<org.springframework.security.core.GrantedAuthority> authorities =
+                java.util.Collections.singletonList(new org.springframework.security.core.authority.SimpleGrantedAuthority("ROLE_USER"));
+        Mockito.doReturn(authorities).when(authentication).getAuthorities();
+
+        // Configuriamo il mock del repository
         Mockito.when(eventRepository.findById(eventId)).thenReturn(Optional.of(existingEvent));
 
-        // 2. ACT & 3. ASSERT (INSIEME)
-        /*
-            assertThrows si aspetta che il codice dentro l'espressione lancia un errore.
-            Se il codice lancia l'eccezione, il test PASSA. Se il codice non si blocca, il test FALLISCE.
-        */
+        // 2. ACT & 3. ASSERT
         assertThrows(AccessDeniedException.class, () -> {
-            // Chiamiamo il metodo inserendo l'ID dell'evento ma passandogli lo username dell'utente malizioso
             eventService.updateEvent(eventId, requestDto, maliciousUser);
         });
 
-        // Verifica di sicurezza finale: dato che l'utente non era il proprietario,
-        // verifichiamo che il metodo .save() sul database NON sia mai stato chiamato (never())
+        // Verifica di sicurezza finale
         Mockito.verify(eventRepository, Mockito.never()).save(any(Event.class));
     }
 
@@ -207,5 +213,85 @@ class EventServiceTest {
         // 3. ASSERT
         // Verifichiamo che il risultato dell'operazione matematica sia esattamente 110 (ovvero 150 - 40)
         assertEquals(110, availableSeats);
+    }
+
+    // TEST 5: VALIDAZIONE PREZZI
+    @Test
+    @DisplayName("Creazione evento fallisce se il prezzo VIP è minore o uguale allo Standard")
+    void createEvent_ThrowsIllegalArgument_WhenVipPriceInvalid() {
+
+        // 1. ARRANGE
+        String username = "organizer_demo";
+        User organizer = new User();
+        organizer.setUsername(username);
+
+        // Prepariamo un input non valido: VIP (30.0) costa meno dello Standard (50.0)
+        EventRequestDto requestDto = new EventRequestDto();
+        requestDto.setTitle("Workshop Autunno");
+        requestDto.setPrice(BigDecimal.valueOf(50.0));
+        requestDto.setVipPrice(BigDecimal.valueOf(30.0));
+
+        Mockito.when(userRepository.findByUsername(username)).thenReturn(Optional.of(organizer));
+
+        // 2. ACT & 3. ASSERT
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            eventService.createEvent(requestDto, username);
+        });
+
+        assertEquals("Il prezzo del biglietto VIP deve essere superiore al prezzo del biglietto Standard.", exception.getMessage());
+
+        // Verifichiamo che l'esecuzione si sia bloccata prima di toccare la persistenza
+        Mockito.verify(eventRepository, Mockito.never()).save(any(Event.class));
+    }
+
+    // TEST 6: MODERAZIONE ADMIN
+    @Test
+    @DisplayName("Aggiornamento ha successo se l'utente è ADMIN anche se non ha creato l'evento")
+    void updateEvent_Success_WhenUserIsAdmin() {
+
+        // 1. ARRANGE
+        Long eventId = 1L;
+        String adminUser = "admin_super";
+        String creatorUser = "organizer_vecchio";
+
+        User organizer = new User();
+        organizer.setUsername(creatorUser);
+
+        Venue venue = new Venue();
+        venue.setId(2L);
+
+        Event existingEvent = new Event("Vecchio Titolo", "Desc", LocalDateTime.now().plusDays(2), BigDecimal.valueOf(10.0), BigDecimal.valueOf(20.0));
+        existingEvent.setId(eventId);
+        existingEvent.setOrganizer(organizer);
+
+        EventRequestDto requestDto = new EventRequestDto();
+        requestDto.setTitle("Nuovo Titolo Modificato dall'Admin");
+        requestDto.setVenueId(2L);
+        requestDto.setPrice(BigDecimal.valueOf(15.0));
+        requestDto.setVipPrice(BigDecimal.valueOf(40.0)); // Valido (VIP > Standard)
+
+        // MOCK DI SPRING SECURITY: Configuriamo l'utente nel contesto come ROLE_ADMIN
+        org.springframework.security.core.Authentication authentication = Mockito.mock(org.springframework.security.core.Authentication.class);
+        org.springframework.security.core.context.SecurityContext securityContext = Mockito.mock(org.springframework.security.core.context.SecurityContext.class);
+        Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
+        org.springframework.security.core.context.SecurityContextHolder.setContext(securityContext);
+
+        java.util.List<org.springframework.security.core.GrantedAuthority> authorities =
+                java.util.Collections.singletonList(new org.springframework.security.core.authority.SimpleGrantedAuthority("ROLE_ADMIN"));
+        Mockito.doReturn(authorities).when(authentication).getAuthorities();
+
+        // Comportamento dei Mock
+        Mockito.when(eventRepository.findById(eventId)).thenReturn(Optional.of(existingEvent));
+        Mockito.when(venueRepository.findById(2L)).thenReturn(Optional.of(venue));
+
+        // 2. ACT
+        EventResponseDto response = eventService.updateEvent(eventId, requestDto, adminUser);
+
+        // 3. ASSERT
+        assertNotNull(response);
+        assertEquals("Nuovo Titolo Modificato dall'Admin", response.getTitle());
+
+        // Verifichiamo che il save esplicito NON sia stato chiamato grazie al Dirty Checking transazionale
+        Mockito.verify(eventRepository, Mockito.never()).save(any(Event.class));
     }
 }

@@ -9,10 +9,12 @@ import com.academy.eventhub.repository.EventRepository;
 import com.academy.eventhub.repository.TicketRepository;
 import com.academy.eventhub.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import org.springframework.security.access.AccessDeniedException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -104,9 +106,13 @@ public class TicketServiceImpl implements TicketService
         Ticket foundTicket = ticketRepository.findById(ticketId)
                 .orElseThrow( () -> new ResourceNotFoundException("Ticket non trovato con id: " + ticketId));
 
+        // 1. Controllo di sicurezza: l'utente può cancellare le proprie prenotazioni, MA l'ADMIN può cancellare quelle di chiunque
+        boolean isAdmin = SecurityContextHolder.getContext().getAuthentication().getAuthorities()
+                .stream().anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"));
+
         // Controllo di sicurezza: l'utente può cancellare solo le PROPRIE prenotazioni
-        if (!foundTicket.getUser().getUsername().equals(currentUsername)) {
-            throw new IllegalArgumentException("Non sei autorizzato a cancellare questa prenotazione.");
+        if (!foundTicket.getUser().getUsername().equals(currentUsername) && !isAdmin ) {
+            throw new AccessDeniedException("Non sei autorizzato a cancellare questa prenotazione.");
         }
 
         // Controllo per verificare che l'evento non sia già iniziato (4 regole di business, punto 4)
@@ -119,7 +125,8 @@ public class TicketServiceImpl implements TicketService
 
         // Cancellazione logica impostando lo stato su CANCELLED
         foundTicket.setStatus(TicketStatus.CANCELLED);
-        ticketRepository.save(foundTicket);
+        // NOTA: ticketRepository.save(foundTicket); RIDONDANTE. Viene salvato in automatico grazie a @Transactional
+        // ticketRepository.save(foundTicket);
 
         /*
             In questo caso la delete è logica in quanto opera sul campo enum "status" (TicketStatus)

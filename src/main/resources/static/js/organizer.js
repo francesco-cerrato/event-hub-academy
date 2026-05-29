@@ -80,13 +80,23 @@ async function handleFormSubmit(event) {
     const authHeader = sessionStorage.getItem('authHeader');
     const id = document.getElementById('eventId').value; // Legge l'id nascosto
     
+    // Raccogliamo i valori numerici dei prezzi
+    const price = parseFloat(document.getElementById('eventPrice').value);
+    const vipPrice = parseFloat(document.getElementById('eventVipPrice').value);
+
+    // ALLINEAMENTO (LATO CLIENT): Blocca l'invio se il VIP costa meno o uguale allo Standard
+    if (vipPrice <= price) {
+        alert("Operazione annullata: Il prezzo del biglietto VIP deve essere superiore al prezzo del biglietto Standard.");
+        return; 
+    }
+
     // Costruzione del payload per il backend
     const eventPayload = {
         title: document.getElementById('eventTitle').value,
         description: document.getElementById('eventDescription').value,
         eventDate: document.getElementById('eventDate').value, // Formato datetime-local nativo
-        price: parseFloat(document.getElementById('eventPrice').value),
-        vipPrice: parseFloat(document.getElementById('eventVipPrice').value),
+        price: price,
+        vipPrice: vipPrice,
         venueId: parseInt(document.getElementById('eventVenue').value)
     };
 
@@ -109,6 +119,9 @@ async function handleFormSubmit(event) {
             alert(isEdit ? 'Evento modificato con successo!' : 'Evento creato con successo!');
             resetOrganizerForm();
             fetchOrganizerEvents(); // Ricarica la lista aggiornata
+        } else if (response.status === 403) {
+            // INTERCETTAZIONE ERRORE REGOLA 7: L'utente non ha i permessi (es. non è il creatore né ADMIN)
+            alert("Errore 403: Non sei autorizzato a completare questa operazione su questo evento.");
         } else {
             const err = await response.json().catch(() => ({}));
             alert(`Errore: ${err.message || 'Verifica i dati inseriti (es. validità dell\'ID sede).'}`);

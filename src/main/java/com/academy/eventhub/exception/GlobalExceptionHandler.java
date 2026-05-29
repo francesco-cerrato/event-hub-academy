@@ -2,6 +2,7 @@ package com.academy.eventhub.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -119,5 +120,25 @@ public class GlobalExceptionHandler
         );
 
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    /*
+        Gestione dei tentativi di accesso non autorizzati a livello logico (Step 8, punto 6).
+        Intercetta le AccessDeniedException lanciate dai Service.
+        Restituisce un codice di stato HTTP 403 Forbidden.
+    */
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ErrorResponse> handleAccessDeniedException(
+            AccessDeniedException exception, WebRequest request)
+    {
+        ErrorResponse errorResponse = new ErrorResponse(
+                LocalDateTime.now(),
+                HttpStatus.FORBIDDEN.value(),                 // 403
+                HttpStatus.FORBIDDEN.getReasonPhrase(),        // "Forbidden"
+                exception.getMessage(),                       // "Non sei autorizzato a cancellare questa prenotazione."
+                request.getDescription(false)
+        );
+
+        return new ResponseEntity<>(errorResponse, HttpStatus.FORBIDDEN);
     }
 }

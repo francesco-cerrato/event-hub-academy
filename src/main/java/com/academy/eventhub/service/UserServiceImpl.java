@@ -4,14 +4,18 @@ import com.academy.eventhub.dto.UserResponseDto;
 import com.academy.eventhub.dto.UserRoleUpdateDto;
 import com.academy.eventhub.dto.UserUpdateDto;
 import com.academy.eventhub.entity.Role;
+import com.academy.eventhub.entity.Ticket;
+import com.academy.eventhub.entity.TicketStatus;
 import com.academy.eventhub.entity.User;
 import com.academy.eventhub.exception.ResourceNotFoundException;
 import com.academy.eventhub.repository.RoleRepository;
+import com.academy.eventhub.repository.TicketRepository;
 import com.academy.eventhub.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -28,15 +32,18 @@ public class UserServiceImpl implements UserService
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
+    private final TicketRepository ticketRepository;
 
     /*
      Costruttore per la Dependency Injection @Autowired
      */
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, RoleRepository roleRepository)
+    public UserServiceImpl(UserRepository userRepository, RoleRepository roleRepository,
+                           TicketRepository ticketRepository)
     {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
+        this.ticketRepository = ticketRepository;
     }
 
     /*
@@ -166,6 +173,40 @@ public class UserServiceImpl implements UserService
 
         return convertToResponseDto(foundUser);
     }
+
+    @Override
+    @Transactional
+    public void banUser(Long id) {
+        // Recupero dell'utente da bannare
+        User foundUser = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Utente non trovato con id: " + id));
+
+        // Revoca di tutti i ruoli attuali e assegnazione del solo ruolo di blocco
+        List<Role> currentRoles = roleRepository.findByUsername(foundUser.getUsername());
+        for (Role role : currentRoles) {
+            roleRepository.delete(role);
+        }
+
+        Role bannedRole = new Role();
+        bannedRole.setUsername(foundUser.getUsername());
+        bannedRole.setAuthority("ROLE_BANNED");
+        roleRepository.save(bannedRole);
+
+        // Annullamento automatico di tutti i biglietti attivi per eventi futuri
+        // Recuperiamo tutti i ticket attivi dell'utente
+        List<Ticket> activeTickets = ticketRepository.findByUserUsername(foundUser.getUsername());
+
+        for (Ticket ticket : activeTickets) {
+            // Se lo stato è ACTIVE e l'evento associato deve ancora iniziare (è nel futuro)
+            if (ticket.getStatus() == TicketStatus.ACTIVE && ticket.getEvent().getEventDate().isAfter(LocalDateTime.now())) {
+                ticket.setStatus(TicketStatus.CANCELLED);
+                // Grazie a @Transactional, le modifiche allo stato del ticket verranno salvate automaticamente
+            }
+        }
+    }
+
+
+
 
     /*
         Metodo di utilità interno (Helper) incaricato di mappare un'entità JPA User

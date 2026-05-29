@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title> EventHub - Il Mio Profilo </title>
+        <link rel="stylesheet" href="css/style.css">
+    </head>
+    <body>
+
+        <header>
+            <nav>
+                <a href="index.html"> <strong> EventHub </strong></a>
+                <div class="nav-links"> 
+                    <a href="login.html" id="navLogin"> Login </a>
+                    <a href="signup.html" id="navSignup"> Registrati </a>
+                    <a href="events.html" id="navEvents"> Eventi </a>
+                    <a href="my-bookings.html" id="navBookings"> Le mie prenotazioni </a>
+                    <a href="profile.html" id="navProfile"> Profilo </a>
+                    <a href="organizer-events.html" id="navOrganizer"> Gestione eventi </a>
+                    <a href="admin.html" id="navAdmin"> Pannello Admin </a>
+                    <a href="#" id="navLogout" onclick="logout()"> Logout </a>
+                </div>
+            </nav>
+        </header>            
+
+        <main>
+            <h1> Gestione Profilo Utente </h1>
+            <hr><br>
+
+            <section style="max-width: 500px; padding: 20px; border: 1px solid #000;">
+                <h3> I tuoi Dati Anagrafici </h3>
+                <br>
+                <form id="profileForm">
+                    <label>Username (non modificabile):</label><br>
+                    <input type="text" id="profileUsername" disabled><br><br>
+
+                    <label>Nome:</label><br>
+                    <input type="text" id="profileFirstname" required><br><br>
+
+                    <label>Cognome:</label><br>
+                    <input type="text" id="profileLastname" required><br><br>
+
+                    <label>Città:</label><br>
+                    <input type="text" id="profileCity" required><br><br>
+
+                    <label>Biografia:</label><br>
+                    <textarea id="profileBio" placeholder="Racconta qualcosa di te..." rows="4" style="width: 100%; max-width: 100%; box-sizing: border-box;"></textarea><br><br>
+
+                    <label>URL Foto Profilo (Avatar):</label><br>
+                    <input type="text" id="profileAvatarUrl" placeholder="http://esempio.com" style="width: 100%; box-sizing: border-box;"><br><br>
+
+                    <button type="submit"> Aggiorna Profilo </button>
+            </form>
+
+            </section>
+        </main>
+
+        <footer>
+            <p>&copy; 2026 EventHub — Progetto Finale Academy</p>
+        </footer>
+
+        <script src="js/auth.js"></script>
+        <script src="js/profile.js"></script>
+    </body>
+</html>

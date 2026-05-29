@@ -9,11 +9,13 @@ import com.academy.eventhub.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -51,6 +53,9 @@ public class EventServiceImpl implements EventService{
         // Recupera l'organizzatore loggato
         User foundOrganizer = userRepository.findByUsername(currentUsername)
                 .orElseThrow( () -> new ResourceNotFoundException("Utente organizer non trovato con username: " + currentUsername));
+
+        // Blocca subito l'esecuzione se i prezzi non sono validi
+        validateEventPrices(dto.getPrice(), dto.getVipPrice());
 
         // Recupera la sede
         Venue foundVenue = venueRepository.findById(dto.getVenueId())
@@ -152,10 +157,18 @@ public class EventServiceImpl implements EventService{
         Event foundEvent = eventRepository.findById(id)
                 .orElseThrow( () -> new ResourceNotFoundException("Evento non trovato con id: " + id));
 
-        // Verifica se l'organizzatore loggato è il reale proprietario dell'evento
-        if (!foundEvent.getOrganizer().getUsername().equals(currentUsername)) {
-            throw new AccessDeniedException("Non sei autorizzato a modificare questo evento, in quanto non lo hai creato tu");
+
+        // Estrazione del ruolo ADMIN dal contesto di sicurezza
+        boolean isAdmin = SecurityContextHolder.getContext().getAuthentication().getAuthorities()
+                .stream().anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"));
+
+        // l'operazione è bloccata se non sei il proprietario e non sei ADMIN
+        if (!foundEvent.getOrganizer().getUsername().equals(currentUsername) && !isAdmin) {
+            throw new AccessDeniedException("Non sei autorizzato a modificare questo evento.");
         }
+
+        // Blocca subito l'esecuzione se i prezzi non sono validi
+        validateEventPrices(dto.getPrice(), dto.getVipPrice());
 
         Venue foundVenue = venueRepository.findById(dto.getVenueId())
                         .orElseThrow( () -> new ResourceNotFoundException("Sede non trovata con id: " + dto.getVenueId()));
@@ -180,8 +193,9 @@ public class EventServiceImpl implements EventService{
             foundEvent.getSpeakers().addAll(foundSpeakers);
         }
 
-        Event updatedEvent = eventRepository.save(foundEvent);
-        return convertToResponseDto(updatedEvent);
+        // NOTA: Con @Transactional il save() esplicito è ridondante, Hibernate aggiorna da solo a fine metodo.
+        // Event updatedEvent = eventRepository.save(foundEvent);
+        return convertToResponseDto(foundEvent);
     }
 
     @Override
@@ -191,9 +205,15 @@ public class EventServiceImpl implements EventService{
         Event foundEvent = eventRepository.findById(id)
                 .orElseThrow( () -> new ResourceNotFoundException("Evento non trovato con id: " + id));
 
-        // Verifica se l'organizzatore loggato è il reale proprietario dell'evento
-        if (!foundEvent.getOrganizer().getUsername().equals(currentUsername)) {
-            throw new AccessDeniedException("Non sei autorizzato a eliminare questo evento");
+
+        // Estrazione del ruolo ADMIN dal contesto di sicurezza
+        boolean isAdmin = SecurityContextHolder.getContext().getAuthentication().getAuthorities()
+                .stream().anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"));
+
+
+        // l'operazione è bloccata se non sei il proprietario e non sei ADMIN
+        if (!foundEvent.getOrganizer().getUsername().equals(currentUsername) && !isAdmin) {
+            throw new AccessDeniedException("Non sei autorizzato a eliminare questo evento.");
         }
 
         eventRepository.delete(foundEvent);
@@ -259,5 +279,13 @@ public class EventServiceImpl implements EventService{
         eventResponseDto.setSpeakers(speakerNames);
 
         return eventResponseDto;
+    }
+
+
+    // Metodo helper per comparare prezzo Standard e prezzo Vip
+    private void validateEventPrices(BigDecimal price, BigDecimal vipPrice) {
+        if (vipPrice == null || price == null || vipPrice.compareTo(price) <= 0) {
+            throw new IllegalArgumentException("Il prezzo del biglietto VIP deve essere superiore al prezzo del biglietto Standard.");
+        }
     }
 }

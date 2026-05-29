@@ -11,6 +11,8 @@ import com.academy.eventhub.repository.FeedbackRepository;
 import com.academy.eventhub.repository.TicketRepository;
 import com.academy.eventhub.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -132,7 +134,9 @@ public class FeedbackServiceImpl implements FeedbackService
         return dtoList;
     }
 
+
     @Override
+    @Transactional
     public FeedbackResponseDto updateFeedback(Long feedbackId, String currentUsername, FeedbackRequestDto dto)
     {
         User currentUser = userRepository.findByUsername(currentUsername)
@@ -141,18 +145,22 @@ public class FeedbackServiceImpl implements FeedbackService
         Feedback foundFeedback = feedbackRepository.findById(feedbackId)
                 .orElseThrow( () -> new ResourceNotFoundException("Feedback non trovato con id: " + feedbackId) );
 
+        // Controllo di sicurezza: solo l'autore può modificare il proprio feedback
         if (!foundFeedback.getUser().getId().equals(currentUser.getId()))
         {
-            throw new IllegalStateException("Operazione negata: non sei autorizzato a modificare questo feedback");
+            throw new AccessDeniedException("Operazione negata: non sei autorizzato a modificare questo feedback");
         }
 
 
         foundFeedback.setRating(dto.getRating());
         foundFeedback.setComment(dto.getComment());
 
-        Feedback updatedFeedback = feedbackRepository.save(foundFeedback);
 
-        return convertToResponseDto(updatedFeedback);
+        // NOTA: grazie a @Transactional e al Dirty Checking, save() è ridondante e si può omettere.
+        // L'istanza modificata viene aggiornata automaticamente a fine metodo.
+        // Feedback updatedFeedback = feedbackRepository.save(foundFeedback);
+
+        return convertToResponseDto(foundFeedback);
     }
 
     @Override
@@ -166,11 +174,14 @@ public class FeedbackServiceImpl implements FeedbackService
         Feedback foundFeedback = feedbackRepository.findById(id)
                 .orElseThrow( () -> new ResourceNotFoundException("Feedback non trovato con id: " + id) );
 
+        // Verifica se l'utente loggato ha il ruolo di AMMINISTRATORE
+        boolean isAdmin = SecurityContextHolder.getContext().getAuthentication().getAuthorities()
+                .stream().anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"));
 
-        // Verifica che l'ID dell'utente loggato coincida con l'ID di chi ha scritto il feedback
-        if (!foundFeedback.getUser().getId().equals(currentUser.getId()))
+        // L'operazione è consentita se l'utente è l'autore oppure se è un ADMIN
+        if (!foundFeedback.getUser().getId().equals(currentUser.getId()) && !isAdmin)
         {
-            throw new IllegalStateException("Operazione negata: non sei autorizzato a cancellare questo feedback");
+            throw new AccessDeniedException("Operazione negata: non sei autorizzato a cancellare questo feedback");
         }
 
         feedbackRepository.delete(foundFeedback);

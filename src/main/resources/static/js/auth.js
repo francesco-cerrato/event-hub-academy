@@ -46,7 +46,7 @@ async function handleSignup(event) {
 }
 
 /*
-    GESTIONE DEL LOGIN (Basic Auth)
+    GESTIONE DEL LOGIN (Basic Auth + Profilazione Ruoli)
 */
 async function handleLogin(event) {
     event.preventDefault(); // Blocca il ricaricamento della pagina HTML
@@ -60,23 +60,36 @@ async function handleLogin(event) {
 
     try {
         // Interroghiamo una rotta protetta del backend per testare se le credenziali sono valide.
-        // Se non hai ancora una rotta specifica, usiamo la lista eventi che richiede l'autenticazione.
-        const response = await fetch(`${API_BASE_URL}/api/events`, {
+        // Recuperiamo il profilo dell'utente dall'endpoint /me per estrarre i ruoli reali (Step 3.4)
+        const response = await fetch(`${API_BASE_URL}/api/users/me`, {
             method: 'GET',
             headers: {
-                'Authorization': authHeaderValue
+                'Authorization': authHeaderValue,
+                'Accept': 'application/json'
             }
         });
 
         if (response.ok) {
-            // Se le credenziali sono giuste, salviamo l'header e lo username nella sessione del browser
+            const userData = await response.json();
+            
+            // VERIFICA DEL BAN (REGOLA 9): Se l'utente ha solo il ruolo BANNED blocchiamo l'accesso
+            if (userData.roles && userData.roles.includes('ROLE_BANNED')) {
+                alert('Accesso negato: Il tuo account è stato sospeso dall\'amministratore.');
+                sessionStorage.clear(); // Resetta preventivamente la sessione
+                return;
+            }
+
+            // Se le credenziali sono giuste, salviamo l'header, lo username e l'array dei ruoli nella sessione del browser
             sessionStorage.setItem('authHeader', authHeaderValue);
             sessionStorage.setItem('username', username);
+            sessionStorage.setItem('roles', JSON.stringify(userData.roles || []));
             
             alert('Login effettuato con successo!');
             window.location.href = 'index.html'; // Sposta l'utente sulla Home come utente loggato
         } else if (response.status === 401) {
             alert('Credenziali non corrette. Riprova.');
+        } else if (response.status === 403) {
+            alert('Accesso negato dal sistema di sicurezza.');
         } else {
             alert('Errore di autenticazione da parte del server.');
         }
@@ -100,6 +113,14 @@ function logout() {
 */
 function updateNavbar() {
     const isLoggedIn = sessionStorage.getItem('authHeader') !== null;
+    let roles = [];
+    
+    // Tenta di estrarre l'elenco dei ruoli salvati in formato stringa JSON
+    try {
+        roles = JSON.parse(sessionStorage.getItem('roles')) || [];
+    } catch(e) {
+        roles = []; // Fallback in caso di sessione vuota
+    }
 
     // Recuperiamo tutti gli elementi della navbar tramite il loro ID
     const navLogin = document.getElementById('navLogin');
@@ -120,14 +141,27 @@ function updateNavbar() {
         if (navProfile) navProfile.classList.remove('hidden');
         if (navLogout) navLogout.classList.remove('hidden');
 
-        // Per ora mostriamo tutti i pannelli gestionali (Verranno profilati nello Step 12)
-        if (navOrganizer) navOrganizer.classList.remove('hidden');
-        if (navAdmin) navAdmin.classList.remove('hidden');
+        // PROFILAZIONE REALE DEI LINK GESTIONALI IN BASE AI RUOLI DEL DB (Step 11/12)
+        if (navOrganizer) {
+            if (roles.includes('ROLE_ORGANIZER') || roles.includes('ROLE_ADMIN')) {
+                navOrganizer.classList.remove('hidden');
+            } else {
+                navOrganizer.classList.add('hidden');
+            }
+        }
+
+        if (navAdmin) {
+            if (roles.includes('ROLE_ADMIN')) {
+                navAdmin.classList.remove('hidden');
+            } else {
+                navAdmin.classList.add('hidden');
+            }
+        }
 
     } else {
         // Se l'utente NON è loggato, mostriamo solo Login, Registrati ed Eventi
         if (navLogin) navLogin.classList.remove('hidden');
-        if (navSignup) navSignup.classList.remove('hidden'); // Corretto qui (rimosso .github)
+        if (navSignup) navSignup.classList.remove('hidden'); 
 
         // Nascondiamo tutto il resto
         if (navBookings) navBookings.classList.add('hidden');
