@@ -136,15 +136,41 @@ public class UserServiceImpl implements UserService
             roleRepository.delete(role);
         }
 
+        // Recupero utente di sistema che PRE-INSERITO nel DB (es. ID 1 o via username)
+        User systemUser = userRepository.findByUsername("SISTEMA_ANONIMO")
+                .orElseThrow(() -> new IllegalStateException("Utente di sistema 'SISTEMA_ANONIMO' non configurato nel DB!"));
+
+
         // Annullamento automatico di tutti i biglietti attivi per eventi futuri
         // Recuperiamo tutti i ticket attivi dell'utente
         List<Ticket> activeTickets = ticketRepository.findByUserUsername(foundUser.getUsername());
 
         for (Ticket ticket : activeTickets) {
             // Se lo stato è ACTIVE e l'evento associato deve ancora iniziare (è nel futuro)
-            if (ticket.getStatus() == TicketStatus.ACTIVE && ticket.getEvent().getEventDate().isAfter(LocalDateTime.now())) {
+            if (ticket.getStatus() == TicketStatus.ACTIVE && ticket.getEvent().getEventDate().isAfter(LocalDateTime.now()))
+            {
                 ticket.setStatus(TicketStatus.CANCELLED);
-                // Grazie a @Transactional, le modifiche allo stato del ticket verranno salvate automaticamente
+
+                /*
+                    MOTIVAZIONE TECNICA (Risoluzione TransientObjectException / NOT NULL Constraint):
+                    Non possiamo impostare 'ticket.setUser(null)' perché la colonna 'user_id' nella
+                    tabella 'ticket' ha un vincolo NOT NULL a livello di database.
+                    Allo stesso tempo, non possiamo lasciare il ticket collegato a 'foundUser' poiché
+                    l'utente sta per essere rimosso dal database alla fine del metodo.
+
+                    SOLUZIONE: Riassegniamo la proprietà del ticket a un utente tecnico di sistema
+                    ('SISTEMA_ANONIMO'). Questo permette di:
+                    Mantenere lo storico dei ticket nel database con stato 'CANCELLED' (richiesto dal business).
+                    Rispettare il vincolo NOT NULL del database relazionale.
+                    Evitare che Hibernate lanci eccezioni di persistenza durante la cancellazione dell'utente reale.
+                 */
+
+                // SOLUZIONE: Sganciamo l'utente dal ticket per evitare il conflitto in cascata
+                ticket.setUser(systemUser);
+
+                // Salviamo esplicitamente il ticket modificato
+                ticketRepository.save(ticket);
+
             }
         }
 

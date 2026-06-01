@@ -71,13 +71,7 @@ async function handleLogin(event) {
 
         if (response.ok) {
             const userData = await response.json();
-            
-            // VERIFICA DEL BAN (REGOLA 9): Se l'utente ha solo il ruolo BANNED blocchiamo l'accesso
-            if (userData.roles && userData.roles.includes('ROLE_BANNED')) {
-                alert('Accesso negato: Il tuo account è stato sospeso dall\'amministratore.');
-                sessionStorage.clear(); // Resetta preventivamente la sessione
-                return;
-            }
+
 
             // Se le credenziali sono giuste, salviamo l'header, lo username e l'array dei ruoli nella sessione del browser
             sessionStorage.setItem('authHeader', authHeaderValue);
